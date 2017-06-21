@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "genDocs": "apidoc -i services/ -o apidoc/"
+    "genDocs": "apidoc -i services/ -o apidoc/",
+    "dbTest": "nodejs services/database/service.js !& ./node_modules/mocha/bin/mocha services/Devicehive/tests/coreLogicTest.js !&"
   },
   "author": "",
   "license": "ISC",
