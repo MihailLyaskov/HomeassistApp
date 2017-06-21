@@ -49,6 +49,18 @@
         "role": "database",
         "cmd": "getData"
       }
+    }, {
+      "hive": "schedule/create",
+      "seneca_service": {
+        "role": "schedule",
+        "cmd": "create"
+      }
+    }, {
+      "hive": "schedule/remove",
+      "seneca_service": {
+        "role": "schedule",
+        "cmd": "remove"
+      }
     }],
     "services_and_sub_paths": [{
       "service": "database",

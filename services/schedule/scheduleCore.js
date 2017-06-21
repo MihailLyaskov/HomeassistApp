@@ -1,9 +1,10 @@
 // @flow weak
 const scheduler = require('node-schedule');
+var _jobs = []
+var _seneca = null
 
 var schedule = function(seneca) {
-  this._seneca = seneca;
-  this._jobs = {};
+  _seneca = seneca;
 }
 
 /**
@@ -34,15 +35,20 @@ schedule.prototype.create = function(args, done) {
     args.hasOwnProperty('maxEnergy') == true) {
     let len = args.schedule.length;
     let jobs = [];
+    let name = args.DeviceID;
     for (let i = 0; i < len; i++) {
-      let beginJob = createJob(args.schedule[i].beginTime)
+      let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, "On")
       jobs.push(beginJob)
-      let endJob = createJob(args.schedule[i].endTime)
+      let endJob = createJob(args.DeviceID, args.schedule[i].endTime, "Off")
       jobs.push(endJob)
     }
-    this._jobs[args.DeviceID] = jobs;
+    _jobs[args.DeviceID] = {jobs:jobs};
+    console.log(_jobs)
+    //SAVE TO MONGODB
+    //SAVE JOB INDEX WITH SCHEDULE IN MONGO
+    //MAKE SUBSCRIPTION
     done(null, {
-      result: this._jobs,
+      result: "Created daily schedule for " + args.DeviceID,
       status: "OK"
     })
   } else {
@@ -53,15 +59,28 @@ schedule.prototype.create = function(args, done) {
   }
 }
 
-function createJob(time) {
+function createJob(device, time, state) {
+  console.log(time)
   let timeArr = parceTimeData(time)
-  console.log(timeArr)
   let rule = new scheduler.RecurrenceRule();
   rule.hour = timeArr.hour;
   rule.minute = timeArr.minute;
   rule.second = timeArr.second;
   return scheduler.scheduleJob(rule, function() {
     console.log(time);
+    _seneca.act({
+      role: "client",
+      cmd: "sendCommand"
+    }, {
+      DeviceID: device,
+      command: "state",
+      params: {
+        state: state
+      }
+    }, function(err, res) {
+      if (err)
+        console.log(err)
+    });
   });
 }
 
@@ -73,6 +92,39 @@ function parceTimeData(time) {
       minute: result[1],
       second: result[2]
     }
+  }
+}
+
+/**
+ * @api {get} schedule/remove Remove a daily schedule for a device
+ * @apiVersion 1.0.0
+ * @apiName remove
+ * @apiGroup Schedule
+ *
+ * @apiParam {String} DeviceID Unique device name.
+ *
+ * @apiExample  Example usage:
+ *{
+ *    "DeviceID": "TestDevice",
+ *}
+ */
+schedule.prototype.remove = function(args, done) {
+  if (args.hasOwnProperty('DeviceID') == true) {
+    let len = _jobs[args.DeviceID].jobs.length;
+    for(let i = 0; i < len; i++){
+      _jobs[args.DeviceID].jobs[i].cancel();
+    }
+    //REMOVE FROM MONGO
+    // MUST CLEAR JOBS ARRAY
+    done(null,{
+      result:"Schedule for "+args.DeviceID+" is removed!",
+      status:"OK"
+    })
+  } else {
+    done(null, {
+      result: 'Missing argumets!',
+      status: "ERROR"
+    })
   }
 }
 

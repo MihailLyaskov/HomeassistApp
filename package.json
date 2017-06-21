@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "genDocs": "apidoc -i services/ -o apidoc/",
+    "genDocs": "./node_modules/apidoc/bin/apidoc -i services/ -o apidoc/",
     "dbTest": "nodejs services/database/service.js !& ./node_modules/mocha/bin/mocha services/Devicehive/tests/coreLogicTest.js !&"
   },
   "author": "",
@@ -19,6 +19,7 @@
     "seneca": "^3.3.0"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "chai": "^4.0.2",
     "mocha": "^3.4.2"
   }

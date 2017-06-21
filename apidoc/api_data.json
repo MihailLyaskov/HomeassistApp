@@ -285,5 +285,35 @@
     ],
     "filename": "services/schedule/scheduleCore.js",
     "groupTitle": "Schedule"
+  },
+  {
+    "type": "get",
+    "url": "schedule/remove",
+    "title": "Remove a daily schedule for a device",
+    "version": "1.0.0",
+    "name": "remove",
+    "group": "Schedule",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "DeviceID",
+            "description": "<p>Unique device name.</p>"
+          }
+        ]
+      }
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "{\n   \"DeviceID\": \"TestDevice\",\n}",
+        "type": "json"
+      }
+    ],
+    "filename": "services/schedule/scheduleCore.js",
+    "groupTitle": "Schedule"
   }
 ]

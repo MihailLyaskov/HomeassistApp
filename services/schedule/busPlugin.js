@@ -1,11 +1,11 @@
 // @flow weak
 
-var Schedule = require('./scheduleCore.js')
+var Scheduler = require('./scheduleCore.js')
 
 
 module.exports = function Schedule(options) {
   var seneca = this;
-  var schedule = new Schedule(seneca);
+  var schedule = new Scheduler(seneca);
 
   seneca.add({
     role: 'schedule',

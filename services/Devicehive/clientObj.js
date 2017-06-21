@@ -45,9 +45,11 @@ client.prototype.unsubscribe = function(args) {
   })
 }
 
-client.prototype.sendCommand = function(deviceID, command, parameters, callback) {
-  console.log([deviceID, command, parameters])
-  callback(null, {
+client.prototype.sendCommand = function(DeviceID, command, params, done) {
+
+  console.log('TestDevice recieved command:')
+  console.log([DeviceID, command, params])
+  done(null, {
     status: 'ok'
   })
 }
