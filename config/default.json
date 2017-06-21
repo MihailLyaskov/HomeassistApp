@@ -1,0 +1,80 @@
+{
+  "DeviceHive": {
+    "url": "http://localhost/api/rest",
+    "api_key": "tulJt9rLSjtgaZ37SwRPXiIdrKMAADDAHTq4hQ/w3KM="
+  },
+  "device_config": {
+    "main_config": {
+      "guid": "homeassist",
+      "name": "homeassist",
+      "key": "stupud_device_key",
+      "status": "Online",
+      "deviceClass": {
+        "name": "application",
+        "version": "1.0"
+      },
+      "equipment": [{
+        "name": "homeassist",
+        "type": "homeassist",
+        "code": "homeassist"
+      }]
+    },
+    "sub_for_comands": [{
+      "hive": "database/startLog",
+      "seneca_service": {
+        "role": "database",
+        "cmd": "startLog"
+      }
+    }, {
+      "hive": "database/stopLog",
+      "seneca_service": {
+        "role": "database",
+        "cmd": "stopLog"
+      }
+    }, {
+      "hive": "database/showSubs",
+      "seneca_service": {
+        "role": "database",
+        "cmd": "showSubs"
+      }
+    }, {
+      "hive": "database/showDevices",
+      "seneca_service": {
+        "role": "database",
+        "cmd": "showDevices"
+      }
+    }, {
+      "hive": "database/getData",
+      "seneca_service": {
+        "role": "database",
+        "cmd": "getData"
+      }
+    }],
+    "services_and_sub_paths": [{
+      "service": "database",
+      "sub_path": {
+        "role": "database",
+        "cmd": "logData"
+      }
+    }, {
+      "service": "schedule",
+      "sub_path": {
+        "role": "schedule",
+        "cmd": "evaluate"
+      }
+    }],
+    "seneca_clients": [{
+      "port": 10102,
+      "pin": "role:database"
+    }, {
+      "port": 10103,
+      "pin": "role:schedule"
+    }],
+    "mongo": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "DHConnector",
+      "collection": "subs"
+    }
+  }
+}

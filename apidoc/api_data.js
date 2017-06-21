@@ -1,0 +1,289 @@
+define({ "api": [
+  {
+    "type": "get",
+    "url": "database/getData",
+    "title": "Query data for a specific device in a specific time period.",
+    "version": "1.0.0",
+    "name": "getData",
+    "group": "Database",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "device",
+            "description": "<p>Unique device name.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "beginTime",
+            "description": "<p>2017-05-04 00:00:00 .</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "endTime",
+            "description": "<p>2017-05-04 00:10:00.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "result",
+            "description": "<p>Array with time , power and energy</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n   \"result\": [{\"time\": ,\"power\": ,\"energy\": }..],\n   \"status\": \"OK\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"result\": <Some Kind of Error>,\n  \"status\": \"ERROR\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "database/logData",
+    "title": "Internal path for directing incoming subscription notifications to database service.",
+    "version": "1.0.0",
+    "name": "logData",
+    "group": "Database",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "device",
+            "description": "<p>Unique device name.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "power",
+            "description": "<p>Power data in whatts.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "energy",
+            "description": "<p>Energy data in whatts per hour.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n   \"result\": \"Data written!\",\n   \"status\": \"OK\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "result",
+            "description": "<p>Data can't be logged for some stupid reason.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "{\n  \"result\": <Some Kind of Error>,\n  \"status\": \"ERROR\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "database/showDevices",
+    "title": "Show all logged devices.",
+    "version": "1.0.0",
+    "name": "showDevices",
+    "group": "Database",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "optional": false,
+            "field": "result",
+            "description": "<p>Array with logged devices.s</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n   \"result\": [{\"device\": }..],\n   \"status\": \"OK\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "database/showSubs",
+    "title": "Show currently active subscriptions.",
+    "version": "1.0.0",
+    "name": "showSubs",
+    "group": "Database",
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "database/startLog",
+    "title": "Start subscription for a specific device.",
+    "version": "1.0.0",
+    "name": "startLog",
+    "group": "Database",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "device",
+            "description": "<p>Unique device name.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "notification",
+            "description": "<p>Notification name.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "database/stopLog",
+    "title": "Stop subscription for a specific device.",
+    "version": "1.0.0",
+    "name": "stopLog",
+    "group": "Database",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "device",
+            "description": "<p>Unique device name.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "notification",
+            "description": "<p>Notification name.</p>"
+          }
+        ]
+      }
+    },
+    "filename": "services/database/busPlugin.js",
+    "groupTitle": "Database"
+  },
+  {
+    "type": "get",
+    "url": "schedule/create",
+    "title": "Create a daily schedule for a device",
+    "version": "1.0.0",
+    "name": "create",
+    "group": "Schedule",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "DeviceID",
+            "description": "<p>Unique device name.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Array",
+            "optional": false,
+            "field": "schedule",
+            "description": "<p>An array containing objects with begin and end hour for an event.</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "beginTime",
+            "description": "<p>Begin time - example: &quot;13:00:00&quot;</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "endTime",
+            "description": "<p>End time - example &quot;14:00:00&quot;</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Float",
+            "optional": false,
+            "field": "maxEnergy",
+            "description": "<p>Maximum energy that should not be passed.</p>"
+          }
+        ]
+      }
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "{\n   \"DeviceID\": \"TestDevice\",\n   \"schedule\": [{\n       \"beginTime\": \"17:00:00\",\n       \"endTime\": \"18:00:00\"\n   }],\n   \"maxEnergy\": 1500.0\n}",
+        "type": "json"
+      }
+    ],
+    "filename": "services/schedule/scheduleCore.js",
+    "groupTitle": "Schedule"
+  }
+] });

@@ -1,0 +1,7 @@
+apps:
+  - script   : ./services/database/service.js
+    name     : 'database'
+    watch    : true
+  - script   : ./services/Devicehive/sanity.js
+    name     : 'DeviceHive-connector'
+    watch    : true
