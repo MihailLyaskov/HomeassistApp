@@ -67,6 +67,12 @@
         "role": "schedule",
         "cmd": "showAll"
       }
+    }, {
+      "hive": "schedule/showSubs",
+      "seneca_service": {
+        "role": "schedule",
+        "cmd": "showSubs"
+      }
     }],
     "services_and_sub_paths": [{
       "service": "database",
