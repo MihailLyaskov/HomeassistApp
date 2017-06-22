@@ -61,6 +61,12 @@
         "role": "schedule",
         "cmd": "remove"
       }
+    }, {
+      "hive": "schedule/showAll",
+      "seneca_service": {
+        "role": "schedule",
+        "cmd": "showAll"
+      }
     }],
     "services_and_sub_paths": [{
       "service": "database",
@@ -87,6 +93,12 @@
       "port": 27017,
       "database": "DHConnector",
       "collection": "subs"
+    },
+    "mongoSchedule": {
+      "host": "localhost",
+      "port": 27017,
+      "database": "scheduler",
+      "collection": "schedules"
     }
   }
 }

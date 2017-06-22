@@ -315,5 +315,22 @@ define({ "api": [
     ],
     "filename": "services/schedule/scheduleCore.js",
     "groupTitle": "Schedule"
+  },
+  {
+    "type": "get",
+    "url": "schedule/showAll",
+    "title": "Remove a daily schedule for a device",
+    "version": "1.0.0",
+    "name": "showAll",
+    "group": "Schedule",
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "{}",
+        "type": "json"
+      }
+    ],
+    "filename": "services/schedule/scheduleCore.js",
+    "groupTitle": "Schedule"
   }
 ] });

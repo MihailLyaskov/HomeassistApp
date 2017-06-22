@@ -48,8 +48,10 @@ createService.init(async function(err, res) {
     console.log(err)
   } else {
     try {
-      let createSchedule = await test1(res)
-      let removeSchedule = await test2(res)
+      let createSchedule = await test1(res,"TEST 1")
+      let showAll = await test2(res,"TEST 2")
+      let removeSchedule = await test3(res,"TEST 3")
+      let showAll2 = await test2(res,"TEST 4")
     } catch (err) {
       console.log(err)
     }
@@ -82,9 +84,9 @@ function calcTime(hour, minute, second) {
   return _hour + ':' + _minute + ':' + _second
 }
 
-function test1(devicehive) {
+function test1(devicehive,test) {
   return new Promise(function(resolve, reject) {
-    console.log('TEST 1:')
+    console.log(test+':')
     let time = moment();
     let begin1 = calcTime(time.hour(), time.minute(), time.second() + 5)
     let end1 = calcTime(time.hour(), time.minute(), time.second() + 10)
@@ -117,10 +119,10 @@ function test1(devicehive) {
   })
 }
 
-function test2(devicehive) {
+function test3(devicehive,test) {
   return new Promise(function(resolve, reject) {
-    console.log('TEST 2:')
-    setTimeout(function(){
+    console.log(test+':')
+    setTimeout(function() {
       console.log('Sending schedule/remove command.')
       devicehive.device.handleCommand("schedule/remove", {
         "DeviceID": "TestDevice"
@@ -133,6 +135,22 @@ function test2(devicehive) {
           resolve(result)
         }
       })
-    },20000)
+    }, 20000)
+  })
+}
+
+function test2(devicehive,test) {
+  return new Promise(function(resolve, reject) {
+    console.log(test+':')
+    console.log('Sending schedule/showAll command.')
+    devicehive.device.handleCommand("schedule/showAll", {}, function(err, result) {
+      if (err) {
+        reject(err)
+      } else {
+        console.log(result)
+        result.status.should.equal("OK");
+        resolve(result)
+      }
+    })
   })
 }
