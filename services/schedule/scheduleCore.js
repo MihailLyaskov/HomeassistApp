@@ -2,9 +2,7 @@
 
 
 // TO DO:
-// Make subscriptions array. Add and remove subs from it when performing schedule create and remove.
-// Use this array to count consumed energy for a subscription. Update database with new consumed energy
-// Make job to zero energy consumption for the current schedule in 00:00:00
+// Add a functionality for the service to load schedules after startup!!
 
 
 const config = require('config');
@@ -51,15 +49,27 @@ schedule.prototype.init = async function(callback) {
  *}
  */
 schedule.prototype.create = async function(args, done) {
-  if (args.hasOwnProperty('DeviceID') == true &&
-    args.hasOwnProperty('schedule') == true &&
-    args.hasOwnProperty('maxEnergy') == true &&
-    args.hasOwnProperty('notification') == true) {
-    if (typeof args.DeviceID === 'string' && Array.isArray(args.schedule) && typeof args.maxEnergy === 'number') {
-      //Create the jobs that will be working on the new schedule
-      let len = args.schedule.length;
-      let jobs = [];
-      let name = args.DeviceID;
+  if (validateSchedule(args)) {
+    //Create the jobs that will be working on the new schedule
+    let len = args.schedule.length;
+    let jobs = [];
+    let name = args.DeviceID;
+    let check = null
+    try {
+      check = await _collection.findOne({
+        Device: name
+      })
+      console.log(check)
+      if (check != null) {
+        done(null, {
+          result: name + ' already has a schedule! Remove it first!',
+          status: "ERROR"
+        })
+      }
+    } catch (err) {
+      console.log(err)
+    }
+    if (check == null) {
       for (let i = 0; i < len; i++) {
         let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, "On")
         jobs.push(beginJob)
@@ -72,8 +82,8 @@ schedule.prototype.create = async function(args, done) {
       });
       //Save the new schedule to database
       try {
-        let saveToMongo = await store(args, _jobs.length - 1)
-        let subscibe = await makeSubscription(args.DeviceID,args.notification)
+        let saveToMongo = await storeInDatabase(args, _jobs.length - 1)
+        let subscibe = await makeSubscription(args.DeviceID, args.notification)
         //console.log(saveToMongo)
       } catch (err) {
         console.error(err)
@@ -81,11 +91,6 @@ schedule.prototype.create = async function(args, done) {
       done(null, {
         result: "Created daily schedule for " + args.DeviceID,
         status: "OK"
-      })
-    } else {
-      done(null, {
-        result: 'Missing or wrong argumets!',
-        status: "ERROR"
       })
     }
   } else {
@@ -95,6 +100,8 @@ schedule.prototype.create = async function(args, done) {
     })
   }
 }
+
+
 
 /**
  * @api {get} schedule/remove Remove a daily schedule for a device
@@ -111,12 +118,19 @@ schedule.prototype.create = async function(args, done) {
  */
 schedule.prototype.remove = async function(args, done) {
   if (args.hasOwnProperty('DeviceID') == true) {
-    let result={};
+    let result = {};
     let removeSub;
     // Remove schedule from database and get schedule index
     try {
-      result = await remove(args.DeviceID)
-      removeSub = await removeSubscription(args.DeviceID,result.notification)
+      result = await removeFromDatabase(args.DeviceID)
+      if (result.status == 'found') {
+        removeSub = await removeSubscription(args.DeviceID, result.notification)
+      } else {
+        done(null, {
+          result: result.message,
+          status: "ERROR"
+        })
+      }
     } catch (err) {
       console.error(err)
     }
@@ -192,15 +206,58 @@ schedule.prototype.showSubs = function(args, done) {
   })
 }
 
-schedule.prototype.evaluate = function(args, done) {
+schedule.prototype.evaluate = async function(args, done) {
   console.log("SCHEDULE EVALUATE:")
-  console.log(args)
-  done(null,{status:"OK"})
+  try {
+    let find = await _collection.findOne({
+      Device: args.device
+    })
+    let energy = find.agrEnergy
+    if (find.maxEnergy < (energy + args.energy)) {
+      let stopDevice = await _seneca.act({
+        role: "client",
+        cmd: "sendCommand",
+        DeviceID: args.device,
+        command: "state",
+        params: {
+          state: "OFF"
+        }
+      });
+    } else {
+      let update = await _collection.updateOne({
+        Device: args.device
+      }, {
+        $set: {
+          agrEnergy: energy + args.energy
+        }
+      });
+    }
+    done(null, {
+      status: "OK"
+    })
+  } catch (err) {
+    done(null, {
+      status: "ERROR"
+    })
+    console.log(err)
+  }
 }
 
+function validateSchedule(args) {
+  if (args.hasOwnProperty('DeviceID') && args.hasOwnProperty('schedule') && args.hasOwnProperty('maxEnergy') &&
+    args.hasOwnProperty('notification')) {
+    if (Array.isArray(args.schedule) && typeof args.DeviceID === 'string' && typeof args.notification === 'string') {
+      return true
+    } else {
+      return false
+    }
+  } else {
+    return false
+  }
+}
 
-function removeSubscription(device,notif){
-  return new Promise(function(resolve,reject){
+function removeSubscription(device, notif) {
+  return new Promise(function(resolve, reject) {
     _seneca.act({
       role: 'client',
       cmd: 'unsubscribe'
@@ -221,8 +278,8 @@ function removeSubscription(device,notif){
   })
 }
 
-function makeSubscription(device,notification){
-  return new Promise(function(resolve,reject){
+function makeSubscription(device, notification) {
+  return new Promise(function(resolve, reject) {
     _seneca.act({
       role: 'client',
       cmd: 'subscribe'
@@ -243,7 +300,7 @@ function makeSubscription(device,notification){
   })
 }
 
-function store(args, index) {
+function storeInDatabase(args, index) {
   return new Promise(async function(resolve, reject) {
     try {
       let insert = await _collection.insertOne({
@@ -251,7 +308,8 @@ function store(args, index) {
         schedule: args.schedule,
         maxEnergy: args.maxEnergy,
         index: index,
-        notification: args.notification
+        notification: args.notification,
+        agrEnergy: 0.0
       })
       resolve(insert)
     } catch (err) {
@@ -260,13 +318,24 @@ function store(args, index) {
   })
 }
 
-function remove(DeviceID) {
+function removeFromDatabase(DeviceID) {
   return new Promise(async function(resolve, reject) {
     try {
       let remove = await _collection.findOneAndDelete({
         Device: DeviceID
       })
-      resolve({index:remove.value.index,notification:remove.value.notification})
+      if (remove.value == null) {
+        resolve({
+          status: 'not found',
+          message: 'No schedule found for ' + DeviceID
+        })
+      } else {
+        resolve({
+          status: 'found',
+          index: remove.value.index,
+          notification: remove.value.notification
+        })
+      }
     } catch (err) {
       reject(err)
     }
