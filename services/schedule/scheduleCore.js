@@ -1,10 +1,4 @@
 // @flow weak
-
-
-// TO DO:
-// Add a functionality for the service to load schedules after startup!!
-
-
 const config = require('config');
 const mongodb = require("mongodb").MongoClient;
 const scheduler = require('node-schedule');
@@ -20,6 +14,7 @@ schedule.prototype.init = async function(callback) {
   try {
     let mongo = await mongodb.connect('mongodb://' + config.device_config.mongoSchedule.host + ':' + config.device_config.mongoSchedule.port + '/' + config.device_config.mongoSchedule.database);
     _collection = await mongo.collection(config.device_config.mongoSchedule.collection);
+    let reCreate = await reCreateSchedules();
     callback(null, _collection);
   } catch (err) {
     callback(err)
@@ -76,6 +71,9 @@ schedule.prototype.create = async function(args, done) {
         let endJob = createJob(args.DeviceID, args.schedule[i].endTime, "Off")
         jobs.push(endJob)
       }
+      // This job resets agregated energy for this schedule in 00:00:00 every day
+      let resetJob = resetAgrEnergyJob(args.DeviceID)
+      jobs.push(resetJob)
       //Add schedule jobs objects to _jobs array for use later
       _jobs.push({
         jobs: jobs
@@ -241,6 +239,54 @@ schedule.prototype.evaluate = async function(args, done) {
     })
     console.log(err)
   }
+}
+
+function resetAgrEnergyJob(device) {
+  let rule = new scheduler.RecurrenceRule();
+  rule.hour = '00';
+  rule.minute = '00';
+  rule.second = '00';
+  return scheduler.scheduleJob(rule, async function() {
+    try {
+      let update = await _collection.updateOne({
+        Device: device
+      }, {
+        $set: {
+          agrEnergy: 0.0
+        }
+      });
+    }catch(err){
+      console.log(err)
+    }
+  });
+}
+
+function reCreateSchedules() {
+  return new Promise(async function(resolve, reject) {
+    try {
+      let result = await _collection.find().toArray()
+      let len = result.length
+      if (len > 0) {
+        for (let i = 0; i < len; i++) {
+          let jobs = [];
+          let scheduleCount = result[i].schedule.length;
+          for (let j = 0; j < scheduleCount; j++) {
+            let beginJob = createJob(result[i].Device, result[i].schedule[j].beginTime, "On")
+            jobs.push(beginJob)
+            let endJob = createJob(result[i].Device, result[i].schedule[j].endTime, "Off")
+            jobs.push(endJob)
+          }
+          _jobs.push({
+            jobs: jobs
+          })
+        }
+        resolve()
+        console.log(_jobs)
+      }
+    } catch (err) {
+      reject(err)
+    }
+  })
 }
 
 function validateSchedule(args) {

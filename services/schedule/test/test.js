@@ -13,7 +13,7 @@ createService.init(async function(err, res) {
     try {
       let create = await createSchedule2(res,"TEST 1")
       //let showAll = await showSchedules(res,"TEST 2")
-      setTimeout(async function(){
+      /*setTimeout(async function(){
         let showAll2 = await showSchedules(res,"TEST 4")
         //let showSubs = await showSubscriptions(res,"TEST 5")
         let sendData = await sendSubData(res, "TEST 6")
@@ -21,7 +21,7 @@ createService.init(async function(err, res) {
         setTimeout(async function(){
           let remove = await removeSchedule(res,"TEST 3")
         }, 30000)
-      },30000)
+      },30000)*/
     } catch (err) {
       console.log(err)
     }
