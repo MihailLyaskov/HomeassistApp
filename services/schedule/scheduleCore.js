@@ -6,6 +6,8 @@ var _jobs = []
 var _seneca = null
 var _collection = null;
 
+
+
 var schedule = function(seneca) {
   _seneca = seneca;
 }
@@ -76,11 +78,12 @@ schedule.prototype.create = async function(args, done) {
       jobs.push(resetJob)
       //Add schedule jobs objects to _jobs array for use later
       _jobs.push({
+        device: args.DeviceID,
         jobs: jobs
       });
       //Save the new schedule to database
       try {
-        let saveToMongo = await storeInDatabase(args, _jobs.length - 1)
+        let saveToMongo = await storeInDatabase(args)
         let subscibe = await makeSubscription(args.DeviceID, args.notification)
         //console.log(saveToMongo)
       } catch (err) {
@@ -123,6 +126,24 @@ schedule.prototype.remove = async function(args, done) {
       result = await removeFromDatabase(args.DeviceID)
       if (result.status == 'found') {
         removeSub = await removeSubscription(args.DeviceID, result.notification)
+        //Cancel jobs working on the removed schedule
+        // find schedule
+        for (let i = 0; i < _jobs.length; i++) {
+          if (_jobs[i].device == args.DeviceID) {
+            let len = _jobs[i].jobs.length;
+            for (let j = 0; j < len; j++) {
+              let cancel = await _jobs[i].jobs[j].cancel();
+            }
+            //Remove jobs from _jobs array
+            _jobs.splice(result.index, 1);
+            //Send result message
+            done(null, {
+              result: "Schedule for " + args.DeviceID + " is removed!",
+              status: "OK"
+            })
+          }
+        }
+
       } else {
         done(null, {
           result: result.message,
@@ -132,18 +153,6 @@ schedule.prototype.remove = async function(args, done) {
     } catch (err) {
       console.error(err)
     }
-    //Cancel jobs working on the removed schedule
-    let len = _jobs[result.index].jobs.length;
-    for (let i = 0; i < len; i++) {
-      _jobs[result.index].jobs[i].cancel();
-    }
-    //Remove jobs from _jobs array
-    _jobs.splice(result.index, 1);
-    //Send result message
-    done(null, {
-      result: "Schedule for " + args.DeviceID + " is removed!",
-      status: "OK"
-    })
   } else {
     done(null, {
       result: 'Missing argumets!',
@@ -255,7 +264,7 @@ function resetAgrEnergyJob(device) {
           agrEnergy: 0.0
         }
       });
-    }catch(err){
+    } catch (err) {
       console.log(err)
     }
   });
@@ -346,14 +355,13 @@ function makeSubscription(device, notification) {
   })
 }
 
-function storeInDatabase(args, index) {
+function storeInDatabase(args) {
   return new Promise(async function(resolve, reject) {
     try {
       let insert = await _collection.insertOne({
         Device: args.DeviceID,
         schedule: args.schedule,
         maxEnergy: args.maxEnergy,
-        index: index,
         notification: args.notification,
         agrEnergy: 0.0
       })
@@ -378,7 +386,6 @@ function removeFromDatabase(DeviceID) {
       } else {
         resolve({
           status: 'found',
-          index: remove.value.index,
           notification: remove.value.notification
         })
       }

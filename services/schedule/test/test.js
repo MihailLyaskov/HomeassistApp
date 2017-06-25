@@ -12,16 +12,17 @@ createService.init(async function(err, res) {
   } else {
     try {
       let create = await createSchedule2(res,"TEST 1")
-      //let showAll = await showSchedules(res,"TEST 2")
-      /*setTimeout(async function(){
-        let showAll2 = await showSchedules(res,"TEST 4")
+      let showAll = await showSchedules(res,"TEST 2")
+      //setTimeout(async function(){
+        //let showAll2 = await showSchedules(res,"TEST 4")
         //let showSubs = await showSubscriptions(res,"TEST 5")
-        let sendData = await sendSubData(res, "TEST 6")
-        let showAll3 = await showSchedules(res,"TEST 4")
+        //let sendData = await sendSubData(res, "TEST 6")
+        //let showAll3 = await showSchedules(res,"TEST 4")
         setTimeout(async function(){
           let remove = await removeSchedule(res,"TEST 3")
+          let showAll2 = await showSchedules(res,"TEST 4")
         }, 30000)
-      },30000)*/
+      //},30000)
     } catch (err) {
       console.log(err)
     }
@@ -141,7 +142,7 @@ function createSchedule(devicehive, test) {
 function removeSchedule(devicehive, test) {
   return new Promise(function(resolve, reject) {
     console.log(test + ':')
-    setTimeout(function() {
+    //setTimeout(function() {
       console.log('Sending schedule/remove command.')
       devicehive.device.handleCommand("schedule/remove", {
         "DeviceID": "TestDevice"
@@ -154,7 +155,7 @@ function removeSchedule(devicehive, test) {
           resolve(result)
         }
       })
-    }, 20000)
+    //}, 20000)
   })
 }
 
