@@ -1,7 +1,7 @@
 {
   "DeviceHive": {
-    "url": "http://localhost/api/rest",
-    "api_key": "tulJt9rLSjtgaZ37SwRPXiIdrKMAADDAHTq4hQ/w3KM="
+    "url": "http://playground.devicehive.com/api/rest",
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJJZCI6MzUsImFjdGlvbnMiOlsiR2V0TmV0d29yayIsIkdldERldmljZSIsIkdldERldmljZVN0YXRlIiwiR2V0RGV2aWNlTm90aWZpY2F0aW9uIiwiR2V0RGV2aWNlQ29tbWFuZCIsIkdldERldmljZUNsYXNzIiwiUmVnaXN0ZXJEZXZpY2UiLCJDcmVhdGVEZXZpY2VOb3RpZmljYXRpb24iLCJDcmVhdGVEZXZpY2VDb21tYW5kIiwiVXBkYXRlRGV2aWNlQ29tbWFuZCIsIkdldEN1cnJlbnRVc2VyIiwiVXBkYXRlQ3VycmVudFVzZXIiLCJNYW5hZ2VUb2tlbiJdLCJuZXR3b3JrSWRzIjpbIjM1Il0sImRldmljZUlkcyI6WyIqIl0sImV4cGlyYXRpb24iOjE1MTQxMTcyNjE2NjQsInRva2VuVHlwZSI6IlJFRlJFU0gifX0.5OfU_uLhTBFKEvk9d9gCFoF4rk1EyeontYTfQ3ZDyQo"
   },
   "device_config": {
     "main_config": {
@@ -19,74 +19,54 @@
         "code": "homeassist"
       }]
     },
-    "sub_for_comands": [{
-      "hive": "database/startLog",
-      "seneca_service": {
+    "sub_for_comands": {
+      "database/startLog": {
         "role": "database",
         "cmd": "startLog"
-      }
-    }, {
-      "hive": "database/stopLog",
-      "seneca_service": {
+      },
+      "database/stopLog": {
         "role": "database",
         "cmd": "stopLog"
-      }
-    }, {
-      "hive": "database/showSubs",
-      "seneca_service": {
+      },
+      "database/showSubs": {
         "role": "database",
         "cmd": "showSubs"
-      }
-    }, {
-      "hive": "database/showDevices",
-      "seneca_service": {
+      },
+      "database/showDevices": {
         "role": "database",
         "cmd": "showDevices"
-      }
-    }, {
-      "hive": "database/getData",
-      "seneca_service": {
+      },
+      "database/getData": {
         "role": "database",
         "cmd": "getData"
-      }
-    }, {
-      "hive": "schedule/create",
-      "seneca_service": {
+      },
+      "schedule/create": {
         "role": "schedule",
         "cmd": "create"
-      }
-    }, {
-      "hive": "schedule/remove",
-      "seneca_service": {
+      },
+      "schedule/remove": {
         "role": "schedule",
         "cmd": "remove"
-      }
-    }, {
-      "hive": "schedule/showAll",
-      "seneca_service": {
+      },
+      "schedule/showAll": {
         "role": "schedule",
         "cmd": "showAll"
-      }
-    }, {
-      "hive": "schedule/showSubs",
-      "seneca_service": {
+      },
+      "schedule/showSubs": {
         "role": "schedule",
         "cmd": "showSubs"
       }
-    }],
-    "services_and_sub_paths": [{
-      "service": "database",
-      "sub_path": {
+    },
+    "services_and_sub_paths": {
+      "database": {
         "role": "database",
         "cmd": "logData"
-      }
-    }, {
-      "service": "schedule",
-      "sub_path": {
+      },
+      "schedule": {
         "role": "schedule",
         "cmd": "evaluate"
       }
-    }],
+    },
     "seneca_clients": [{
       "port": 10102,
       "pin": "role:database"
