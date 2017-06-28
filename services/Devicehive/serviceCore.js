@@ -16,6 +16,7 @@ core.prototype.init = function(Devicehive, Seneca) {
     try {
       let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
       mongoCollection = await mongo.collection(config.device_config.mongo.collection);
+      let initSub = await initialSubscribe();
       resolve(mongoCollection);
     } catch (err) {
       reject(err)
@@ -179,6 +180,32 @@ function unsub(args) {
   })
 }
 
+function initialSubscribe(){
+  return new Promise(async function(resolve,reject){
+    try{
+      let getSubscriptions = await mongoCollection.find()
+      let toArray = await getSubscriptions.toArray()
+      let arrLen = toArray.length
+      if(arrLen > 0){
+        for(let i = 0; i < arrLen; i++){
+          let sub = await devicehive.subscribe({
+            deviceIds: toArray[i].Device,
+            names: toArray[i].notification,
+            service: toArray[i].subService
+          })
+          console.log(toArray)
+        }
+        resolve()
+      }
+      else{
+        console.log(toArray)
+        resolve()
+      }
+    }catch(err){
+
+    }
+  })
+}
 
 
 module.exports = core;
