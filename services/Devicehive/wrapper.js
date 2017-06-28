@@ -4,7 +4,7 @@ const config = require('config');
 var Connector = require("./connector")
 var ServiceCore = require("./serviceCore");
 var seneca = require('seneca')({
-  timeout: 2000
+  timeout: 7000
 });
 
 var connector = new Connector(config, seneca)

@@ -78,7 +78,12 @@ influxdb_client.prototype.getData = function(args, callback) {
     } else {
       stdout = stdout.replace('\n','')
       var out = JSON.parse(stdout)
-      callback(null, out.series[0])
+      if(out.series)
+        callback(null, out.series[0])
+      else {
+        console.log(out)
+        callback(null,"Try again")
+      }
     }
   });
 }

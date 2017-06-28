@@ -1,14 +1,25 @@
 //@flow weak
 var moment = require('moment-timezone');
-const Hive = require('devicehive')
+var config = require('config');
+const Hive = require('devicehive');
 const token = 'eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJJZCI6MzUsImFjdGlvbnMiOlsiR2V0TmV0d29yayIsIkdldERldmljZSIsIkdldERldmljZVN0YXRlIiwiR2V0RGV2aWNlTm90aWZpY2F0aW9uIiwiR2V0RGV2aWNlQ29tbWFuZCIsIkdldERldmljZUNsYXNzIiwiUmVnaXN0ZXJEZXZpY2UiLCJDcmVhdGVEZXZpY2VOb3RpZmljYXRpb24iLCJDcmVhdGVEZXZpY2VDb21tYW5kIiwiVXBkYXRlRGV2aWNlQ29tbWFuZCIsIkdldEN1cnJlbnRVc2VyIiwiVXBkYXRlQ3VycmVudFVzZXIiLCJNYW5hZ2VUb2tlbiJdLCJuZXR3b3JrSWRzIjpbIjM1Il0sImRldmljZUlkcyI6WyIqIl0sImV4cGlyYXRpb24iOjE1MTQxMTcyNjE2NjQsInRva2VuVHlwZSI6IlJFRlJFU0gifX0.5OfU_uLhTBFKEvk9d9gCFoF4rk1EyeontYTfQ3ZDyQo'
 const dhNode = new Hive.rest('http://playground.devicehive.com/api/rest')
 var begin = moment().tz("Europe/Sofia").format();
-var end = null
+var end = null;
+var mongoSchedule = null;
+var mongoSubs = null;
+//var mongodb = require("mongodb").MongoClient;
 
 
 async function start() {
   try {
+
+    //let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
+    //mongoSubs = await mongo.collection(config.device_config.mongo.collection);
+
+    //let mongo2 = await mongodb.connect('mongodb://' + config.device_config.mongoSchedule.host + ':' + config.device_config.mongoSchedule.port + '/' + config.device_config.mongoSchedule.database);
+    //mongoSchedule = await mongo2.collection(config.device_config.mongoSchedule.collection);
+
     let newToken = await dhNode.refreshToken(token)
     dhNode.token = newToken['accessToken'];
     console.log('Token refreshed');
@@ -92,6 +103,8 @@ async function start() {
     console.log(getDevices.result.values)
     console.log('\n\n')
 
+    //let clearSubs = await mongoSubs.drop()
+    //let clearSchedules = await mongoSchedule.drop()
 
   } catch (err) {
     console.log(err)

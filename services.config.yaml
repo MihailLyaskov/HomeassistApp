@@ -5,3 +5,6 @@ apps:
   - script   : ./services/Devicehive/service.js
     name     : 'DeviceHive-connector'
     watch    : true
+  - script   : ./services/schedule/service.js
+    name     : 'DeviceHive-connector'
+    watch    : true
