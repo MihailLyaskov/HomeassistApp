@@ -202,7 +202,7 @@ function initialSubscribe(){
         resolve()
       }
     }catch(err){
-
+      console.error(err)
     }
   })
 }
