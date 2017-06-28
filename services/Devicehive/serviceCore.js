@@ -1,24 +1,21 @@
 //@flow weak
-var config;
-var mongoCollection;
+var config = null;;
+var mongoCollection = null;;
 var mongodb = require("mongodb").MongoClient;
-var client;
-var device;
-var seneca;
+var devicehive = null;
+var seneca = null;
 
 var core = function(Config) {
   config = Config;
 }
 
-core.prototype.init = function(Client, Device, Seneca) {
-  client = Client;
-  device = Device;
+core.prototype.init = function(Devicehive, Seneca) {
+  devicehive = Devicehive;
   seneca = Seneca;
   return new Promise(async function(resolve, reject) {
     try {
       let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
       mongoCollection = await mongo.collection(config.device_config.mongo.collection);
-      let commandsSubscription = await device.Subscribe(config.device_config.sub_for_comands);
       resolve(mongoCollection);
     } catch (err) {
       reject(err)
@@ -43,19 +40,22 @@ core.prototype.showSubs = async function(args, done) {
   }
 }
 
+
 core.prototype.sendNotification = async function(args, done) {
   if (args.hasOwnProperty('notificationName') == true &&
     args.hasOwnProperty('data') == true) {
-    device.sendNotification(args.notificationName, args.data, function(err, res) {
-      if (err) done(null, {
-        result: err,
-        status: 'Error'
-      });
-      else done(null, {
-        result: res,
+    try {
+      let result = await devicehive.sendNotification(args.notificationName, args.data)
+      done(null, {
+        result: result,
         status: 'ok'
       });
-    });
+    } catch (err) {
+      done(null, {
+        result: err,
+        status: 'Error'
+      })
+    }
   } else {
     done(null, "Missing or wrong params!");
   }
@@ -64,16 +64,18 @@ core.prototype.sendNotification = async function(args, done) {
 core.prototype.sendCommand = async function(args, done) {
   if (args.hasOwnProperty('DeviceID') == true &&
     args.hasOwnProperty('command') == true && args.hasOwnProperty('params') == true) {
-    client.sendCommand(args.DeviceID, args.command, args.params, function(err, res) {
-      if (err) done(null, {
+    try {
+      let result = await devicehive.sendCommand(args.DeviceID, args.command, args.params)
+      done(null, {
+        result: result,
+        status: 'ok'
+      });
+    } catch (err) {
+      done(null, {
         result: err,
         status: 'Error'
       });
-      else done(null, {
-        result: res,
-        status: 'ok'
-      });
-    });
+    }
   } else {
     done(null, "Missing or wrong params!");
   }
@@ -86,42 +88,25 @@ core.prototype.subscribe = async function(args, done) {
   //console.error(args);
   if (args.params.hasOwnProperty('DeviceID') == true &&
     args.params.hasOwnProperty('notification') == true) {
+    console.log('start subscribe')
+    console.log(args)
     try {
-      let subscribe = await client.subscribe({
+      let sub = await devicehive.subscribe({
         deviceIds: args.params.DeviceID,
         names: args.params.notification,
-        onMessage: args.params.notification
+        service: args.params.service
       })
-      console.log(subscribe)
+      //console.log(subscribe)
       let insert = await mongoCollection.insertOne({
         Device: args.params.DeviceID,
         notification: args.params.notification,
-        subID: subscribe.id,
         subService: args.params.service
       })
-      let handleMessages = await subscribe.message(async function(DeviceIds, data) {
-        return new Promise(function(resolve, reject) {
-          let doneFlag = false
-          let servicesArray = config.device_config.services_and_sub_paths;
-          for (let i = 0; i < servicesArray.length; i++) {
-            if (args.params.service == servicesArray[i].service) {
-              doneFlag = true;
-              seneca.act(servicesArray[i].sub_path, data, function(err, res) {
-                if (err) reject(err);
-                else {
-                  resolve(res);
-                }
-              });
-            } else if (i == servicesArray.length - 1 && doneFlag == false) {
-              reject("No subscription handlerS")
-            }
-          }
-        })
-      });
       done(null, {
         status: 'ok'
       })
     } catch (err) {
+      console.log(err)
       done(null, {
         status: 'Error'
       });
@@ -163,7 +148,7 @@ core.prototype.unsubscribe = async function(args, done) {
   }
 }
 
-
+/*
 core.prototype.getDevice = async function(args, done) {
   client.getDevice(args.DeviceID, function(err, res) {
     if (err) {
@@ -172,12 +157,12 @@ core.prototype.getDevice = async function(args, done) {
     } else done(null, res);
   });
 }
-
+*/
 function unsub(args) {
   return new Promise(async function(resolve, reject) {
     if (args != null) {
       try {
-        let result = await client.unsubscribe(args.subID)
+        let result = await devicehive.unsubscribe(args)
         resolve({
           removeSub: true,
           res: result

@@ -177,6 +177,8 @@ module.exports = function Database(options) {
   function startLog(args, done) {
     if (args.hasOwnProperty('device') == true &&
       args.hasOwnProperty('notification') == true) {
+      console.log('Start log')
+      console.log(args)
       seneca.act({
         role: 'client',
         cmd: 'subscribe'

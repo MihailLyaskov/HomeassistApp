@@ -12,6 +12,7 @@
   "dependencies": {
     "async": "^2.3.0",
     "config": "^1.25.1",
+    "devicehive": "^1.0.2",
     "influx": "^5.0.7",
     "moment": "^2.18.1",
     "mongodb": "^2.2.26",

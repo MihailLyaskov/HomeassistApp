@@ -1,13 +1,13 @@
 //@flow weak
 const config = require('config');
-var Device = require("./deviceObj");
-var Client = require("./clientObj");
+
+var Connector = require("./connector")
 var ServiceCore = require("./serviceCore");
 var seneca = require('seneca')({
-  timeout: 2000
+  timeout: 7000
 });
-var device = new Device(config);
-var client = new Client();
+
+var connector = new Connector(config, seneca)
 var core = new ServiceCore(config)
 
 var wrapper = function() {
@@ -16,12 +16,10 @@ var wrapper = function() {
 
 wrapper.prototype.init = async function(callback) {
   try {
-    let Client = await client.init();
-    let Device = await device.init();
+    let devicehive = await connector.init();
     let senecaClients = await createClients();
     let senecaListen = await seneca.listen()
-    let Core = await core.init(client, device, seneca);
-    let giveSeneca = await device.setSeneca(seneca);
+    let Core = await core.init(connector,seneca);
     let initPlugin = await seneca.use('./busPlugin', {
       core: core
     })
@@ -33,10 +31,7 @@ wrapper.prototype.init = async function(callback) {
         //console.log(res)
       }
     });
-    callback(null, {
-      client: client,
-      device: device
-    })
+    callback(null)
   } catch (err) {
     console.log("Wrapper init error")
     callback(err)
