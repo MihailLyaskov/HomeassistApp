@@ -247,6 +247,20 @@ define({ "api": [
           },
           {
             "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "command",
+            "description": "<p>Device command</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "parameters",
+            "description": "<p>Parameters passed to Device command</p>"
+          },
+          {
+            "group": "Parameter",
             "type": "Array",
             "optional": false,
             "field": "schedule",
@@ -279,7 +293,7 @@ define({ "api": [
     "examples": [
       {
         "title": "Example usage:",
-        "content": "{\n   \"DeviceID\": \"TestDevice\",\n   \"schedule\": [{\n       \"beginTime\": \"17:00:00\",\n       \"endTime\": \"18:00:00\"\n   }],\n   \"maxEnergy\": 1500.0,\n   \"notification\": \"device/int\"\n}",
+        "content": "{\n   \"DeviceID\": \"TestDevice\",\n   \"start\": {\n \"      \"command\": \"device/init\",\n     \"parameters\": {}\n   },\n   \"stop\": {\n \"      \"command\": \"device/init\",\n     \"parameters\": {}\n   },\n   \"schedule\": [{\n       \"beginTime\": \"17:00:00\",\n       \"endTime\": \"18:00:00\"\n   }],\n   \"maxEnergy\": 1500.0,\n   \"notification\": \"device/int\"\n}",
         "type": "json"
       }
     ],

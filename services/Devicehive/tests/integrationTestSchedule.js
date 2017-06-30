@@ -63,7 +63,7 @@ async function start() {
     console.log(notif2)
     console.log('\n\n')
 
-    let delay3 = await delay(70)
+    let delay3 = await delay(30)
 
     console.log("Send schedule/remove" )
     let removeSchedule = await sendCommand('homeassist', 'schedule/remove', {
@@ -153,6 +153,18 @@ function createSchedule() {
       let end1 = calcTime(time.hour(), time.minute() + 1, time.second() + 5)
       let schedule = {
         "DeviceID": "TestDevice",
+        "start": {
+          "command":"device/control",
+          "parameters":{
+            "state":"On"
+          }
+        },
+        "stop": {
+          "command":"device/control",
+          "parameters":{
+            "state":"Off"
+          }
+        },
         "schedule": [{
           "beginTime": begin1,
           "endTime": end1

@@ -29,6 +29,8 @@ schedule.prototype.init = async function(callback) {
  * @apiGroup Schedule
  *
  * @apiParam {String} DeviceID Unique device name.
+ * @apiParam {String} command Device command
+ * @apiParam {Object} parameters Parameters passed to Device command
  * @apiParam {Array} schedule An array containing objects with begin and end hour for an event.
  * @apiParam {String} beginTime Begin time - example: "13:00:00"
  * @apiParam {String} endTime End time - example "14:00:00"
@@ -37,6 +39,14 @@ schedule.prototype.init = async function(callback) {
  * @apiExample  Example usage:
  *{
  *    "DeviceID": "TestDevice",
+ *    "start": {
+ "      "command": "device/init",
+ *      "parameters": {}
+ *    },
+ *    "stop": {
+ "      "command": "device/init",
+ *      "parameters": {}
+ *    },
  *    "schedule": [{
  *        "beginTime": "17:00:00",
  *        "endTime": "18:00:00"
@@ -68,9 +78,9 @@ schedule.prototype.create = async function(args, done) {
     }
     if (check == null) {
       for (let i = 0; i < len; i++) {
-        let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, "On")
+        let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, args.start, "On")
         jobs.push(beginJob)
-        let endJob = createJob(args.DeviceID, args.schedule[i].endTime, "Off")
+        let endJob = createJob(args.DeviceID, args.schedule[i].endTime, args.stop, "Off")
         jobs.push(endJob)
       }
       // This job resets agregated energy for this schedule in 00:00:00 every day
@@ -225,10 +235,8 @@ schedule.prototype.evaluate = async function(args, done) {
         role: "client",
         cmd: "sendCommand",
         DeviceID: args.device,
-        command: "state",
-        params: {
-          state: "OFF"
-        }
+        command: find.stop.command,
+        params: find.stop.parameters
       });
     } else {
       let update = await _collection.updateOne({
@@ -280,11 +288,15 @@ function reCreateSchedules() {
           let jobs = [];
           let scheduleCount = result[i].schedule.length;
           for (let j = 0; j < scheduleCount; j++) {
-            let beginJob = createJob(result[i].Device, result[i].schedule[j].beginTime, "On")
+            let beginJob = createJob(result[i].Device, result[i].schedule[j].beginTime, result[i].start, "On")
             jobs.push(beginJob)
-            let endJob = createJob(result[i].Device, result[i].schedule[j].endTime, "Off")
+            let endJob = createJob(result[i].Device, result[i].schedule[j].endTime, result[i].stop,"Off")
             jobs.push(endJob)
           }
+          // This job resets agregated energy for this schedule in 00:00:00 every day
+          let resetJob = resetAgrEnergyJob(result[i].DeviceID)
+          jobs.push(resetJob)
+
           _jobs.push({
             jobs: jobs
           })
@@ -300,7 +312,7 @@ function reCreateSchedules() {
 
 function validateSchedule(args) {
   if (args.hasOwnProperty('DeviceID') && args.hasOwnProperty('schedule') && args.hasOwnProperty('maxEnergy') &&
-    args.hasOwnProperty('notification')) {
+    args.hasOwnProperty('notification') && args.hasOwnProperty('start') && args.hasOwnProperty('stop')) {
     if (Array.isArray(args.schedule) && typeof args.DeviceID === 'string' && typeof args.notification === 'string') {
       return true
     } else {
@@ -360,6 +372,8 @@ function storeInDatabase(args) {
     try {
       let insert = await _collection.insertOne({
         Device: args.DeviceID,
+        start: args.start,
+        stop: args.stop,
         schedule: args.schedule,
         maxEnergy: args.maxEnergy,
         notification: args.notification,
@@ -395,7 +409,7 @@ function removeFromDatabase(DeviceID) {
   })
 }
 
-function createJob(device, time, state) {
+function createJob(device, time, command,state) {
   console.log(time)
   let timeArr = parceTimeData(time)
   let rule = new scheduler.RecurrenceRule();
@@ -409,10 +423,8 @@ function createJob(device, time, state) {
       cmd: "sendCommand"
     }, {
       DeviceID: device,
-      command: "state",
-      params: {
-        state: state
-      }
+      command: command.command,
+      params: command.parameters
     }, function(err, res) {
       if (err)
         console.log(err)
