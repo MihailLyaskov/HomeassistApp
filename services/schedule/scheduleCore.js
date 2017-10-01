@@ -57,6 +57,11 @@ schedule.prototype.init = async function(callback) {
  */
 schedule.prototype.create = async function(args, done) {
   if (validateSchedule(args)) {
+    if(config.Debug == true){
+      console.log('\n Schedule service , input , create function \n')
+      console.log(args)
+      console.log('\n')
+    }
     //Create the jobs that will be working on the new schedule
     let len = args.schedule.length;
     let jobs = [];
@@ -66,7 +71,7 @@ schedule.prototype.create = async function(args, done) {
       check = await _collection.findOne({
         Device: name
       })
-      console.log(check)
+      //console.log(check)
       if (check != null) {
         done(null, {
           result: name + ' already has a schedule! Remove it first!',
@@ -74,7 +79,7 @@ schedule.prototype.create = async function(args, done) {
         })
       }
     } catch (err) {
-      console.log(err)
+      //console.log(err)
     }
     if (check == null) {
       for (let i = 0; i < len; i++) {
@@ -227,20 +232,20 @@ schedule.prototype.evaluate = async function(args, done) {
   console.log("SCHEDULE EVALUATE:")
   try {
     let find = await _collection.findOne({
-      Device: args.device
+      Device: args.DeviceID
     })
     let energy = find.agrEnergy
     if (find.maxEnergy < (energy + args.energy)) {
       let stopDevice = await _seneca.act({
         role: "client",
         cmd: "sendCommand",
-        DeviceID: args.device,
+        DeviceID: args.DeviceID,
         command: find.stop.command,
         params: find.stop.parameters
       });
     } else {
       let update = await _collection.updateOne({
-        Device: args.device
+        Device: args.DeviceID
       }, {
         $set: {
           agrEnergy: energy + args.energy
