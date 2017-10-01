@@ -1,7 +1,7 @@
 //@flow weak
 
 const influx_client = require('./influx_client')
-
+const config = require('config')
 
 module.exports = function Database(options) {
   var database = new influx_client();
@@ -61,14 +61,28 @@ module.exports = function Database(options) {
     if (args.hasOwnProperty('device') == true &&
       args.hasOwnProperty('power') == true &&
       args.hasOwnProperty('energy') == true) {
+      if(config.Debug == true){
+          console.log('\n Database service , input , logData function \n')
+          console.log(args)
+          console.log('\n')
+      }
       database.logData(args, function(err, res) {
         if (err) {
-          console.error(err);
+          if(config.Debug == true){
+              console.log('\nERROR Database service , output , logData function \n')
+              console.log(err)
+              console.log('\n')
+          }
           done(null, {
             result: err,
             status: "ERROR"
           })
         } else {
+          if(config.Debug == true){
+              console.log('\n Database service , output , logData function \n')
+              console.log(res)
+              console.log('\n')
+          }
           done(null, {
             result: res,
             status: 'OK'
@@ -111,14 +125,28 @@ module.exports = function Database(options) {
     if (args.hasOwnProperty('device') == true &&
       args.hasOwnProperty('beginTime') == true &&
       args.hasOwnProperty('endTime') == true) {
+      if(config.Debug == true){
+          console.log('\nDatabase service , input , getData function \n')
+          console.log(args)
+          console.log('\n')
+      }
       database.getData(args, function(err, res) {
         if (err) {
-          console.log(err);
+          if(config.Debug == true){
+              console.log('\nERROR Database service , output , getData function \n')
+              console.log(err)
+              console.log('\n')
+          }
           done(null, {
             result: err,
             status: "ERROR"
           })
         } else {
+          if(config.Debug == true){
+              console.log('\nDatabase service , output , getData function \n')
+              console.log(res)
+              console.log('\n')
+          }
           done(null, {
             result: res,
             status: 'OK'
@@ -149,14 +177,28 @@ module.exports = function Database(options) {
    *
    */
   function showDevices(args, done) {
+    if(config.Debug == true){
+        console.log('\nDatabase service , input , showDevices function \n')
+        console.log(args)
+        console.log('\n')
+    }
     database.showDevices(function(err, res) {
       if (err) {
-        console.log(err);
+        if(config.Debug == true){
+            console.log('\nERROR Database service , output , showDevices function \n')
+            console.log(err)
+            console.log('\n')
+        }
         done(null, {
           result: err,
           status: "ERROR"
         })
       } else {
+        if(config.Debug == true){
+            console.log('\nDatabase service , output , showDevices function \n')
+            console.log(res)
+            console.log('\n')
+        }
         done(null, {
           result: res,
           status: 'OK'
@@ -177,8 +219,11 @@ module.exports = function Database(options) {
   function startLog(args, done) {
     if (args.hasOwnProperty('device') == true &&
       args.hasOwnProperty('notification') == true) {
-      console.log('Start log')
-      console.log(args)
+      if(config.Debug == true){
+        console.log('\nDatabase service , input , startLog function \n')
+        console.log(args)
+        console.log('\n')
+      }
       seneca.act({
         role: 'client',
         cmd: 'subscribe'
@@ -190,12 +235,21 @@ module.exports = function Database(options) {
         }
       }, function(err, res) {
         if (res.status == 'Error') {
-          console.error(err)
+          if(config.Debug == true){
+            console.log('\nERROR Database service , output , startLog function \n')
+            console.log(err)
+            console.log('\n')
+          }
           done(null, {
             result: err,
             status: 'Error'
           })
         } else {
+          if(config.Debug == true){
+            console.log('\nDatabase service , output , startLog function \n')
+            console.log(args)
+            console.log('\n')
+          }
           done(null, {
             result: `Started logging data for ${args.device}!`,
             status: 'OK'
@@ -223,6 +277,11 @@ module.exports = function Database(options) {
   function stopLog(args, done) {
     if (args.hasOwnProperty('device') == true &&
       args.hasOwnProperty('notification') == true) {
+      if(config.Debug == true){
+          console.log('\nDatabase service , input , stopLog function \n')
+          console.log(args)
+          console.log('\n')
+      }
       seneca.act({
         role: 'client',
         cmd: 'unsubscribe'
@@ -234,12 +293,21 @@ module.exports = function Database(options) {
         }
       }, function(err, res) {
         if (res.status == 'Error') {
-          console.error(err)
+          if(config.Debug == true){
+              console.log('\nERROR Database service , output , stopLog function \n')
+              console.log(err)
+              console.log('\n')
+          }
           done(null, {
             result: err,
             status: 'Error'
           })
         } else {
+          if(config.Debug == true){
+              console.log('\nDatabase service , output , stopLog function \n')
+              console.log(res)
+              console.log('\n')
+          }
           done(null, {
             result: `Stoped log for ${args.device}!`,
             status: 'OK'
@@ -262,17 +330,31 @@ module.exports = function Database(options) {
    *
    */
   function showSubs(args, done) {
+    if(config.Debug == true){
+      console.log('\nDatabase service , input , showSubs function \n')
+      console.log(args)
+      console.log('\n')
+    }
     seneca.act({
       role: 'client',
       cmd: 'showSubs'
     }, function(err, res) {
       if (res.status == 'Error') {
-        //console.error(err)
+        if(config.Debug == true){
+          console.log('\nERROR Database service , output , showSubs function \n')
+          console.log(err)
+          console.log('\n')
+        }
         done(null, {
           result: err,
           status: 'Error'
         })
       } else {
+        if(config.Debug == true){
+          console.log('\nDatabase service , output , showSubs function \n')
+          console.log(res)
+          console.log('\n')
+        }
         done(null, {
           result: res.data,
           status: 'OK'

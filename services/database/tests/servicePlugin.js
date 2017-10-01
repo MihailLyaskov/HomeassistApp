@@ -29,11 +29,13 @@ function plugin(options) {
     function handleSubscribe(args, done) {
         subs.push(args);
         subscribe = 'ON';
+        console.log('Test , handleSubscribe, SUBSCRIPTION IS MADE')
         done(null, {status:"OK"});
     }
 
     function handleUnsubscribe(args, done) {
         subscribe = 'OFF';
+        console.log('Test , handleUnsubscribe, UNSUBSCRIBE DONE')
         done(null, {status:"OK"});
     }
 
@@ -46,122 +48,118 @@ var servicePlugin = function() {
 
 }
 
-servicePlugin.prototype.showDevices = function(callback) {
-    seneca.act({
-        role: 'database',
-        cmd: 'showDevices'
-    }, function(err, res) {
-        if (err)
-            callback(err)
-        else {
-            callback(null,res)
-        }
-    })
+servicePlugin.prototype.showDevices = function() {
+  return new Promise(async function(resolve,reject){
+    try{
+      let showDevices = await sendToService({
+          role: 'database',
+          cmd: 'showDevices'
+      })
+      resolve(showDevices)
+    }catch(err){
+      reject(err)
+    }
+  })
 }
 
-servicePlugin.prototype.getData = function(args, callback) {
-    seneca.act({
-        role: 'database',
-        cmd: 'getData'
-    }, {
-        device: args.DeviceID,
-        beginTime: args.beginTime,
-        endTime: args.endTime
-    }, function(err, res) {
-        console.log("SERVICE END")
-        if (err){
-            console.log(err)
-            callback(err)
-        }
-        else {
-            callback(null,res)
-        }
-    })
+servicePlugin.prototype.getData = function(args) {
+  return new Promise(async function(resolve,reject){
+    try{
+      let getData = await sendToService({
+          role: 'database',
+          cmd: 'getData'
+      }, {
+          device: args.DeviceID,
+          beginTime: args.beginTime,
+          endTime: args.endTime
+      })
+      resolve(getData)
+    }catch(err){
+      reject(err)
+    }
+  })
 }
 
-servicePlugin.prototype.startLog = function(args, callback) {
-    seneca.act({
-        role: 'database',
-        cmd: 'startLog'
-    }, {
-        device: args.DeviceID,
-        notification: args.notification
-    }, function(err, res) {
-        if (err != null) callback(err)
-        else callback(null,res)
-
-    })
+servicePlugin.prototype.startLog = function(args) {
+  return new Promise(async function(resolve,reject){
+    try{
+      let start = await sendToService({
+          role: 'database',
+          cmd: 'startLog'
+      },{
+          device: args.DeviceID,
+          notification: args.notification
+      })
+      resolve(start)
+    }catch(err){
+      reject(err)
+    }
+  })
 }
 
-servicePlugin.prototype.stopLog = function(args, callback) {
-    seneca.act({
+
+servicePlugin.prototype.stopLog = function(args) {
+  return new Promise(async function(resolve,reject){
+    try{
+      let stopLog = await sendToService({
         role: 'database',
         cmd: 'stopLog'
-    }, {
+      }, {
         device: args.DeviceID,
         notification: args.notification
-    }, function(err, res) {
-        if (err)
-            callback(err)
-        else {
-            callback(null,res)
-        }
-    })
-}
-
-servicePlugin.prototype.showSubs = function(callback) {
-    seneca.act({
-        role: 'database',
-        cmd: 'showSubs'
-    }, function(err, res) {
-        if (err)
-            callback(err)
-        else {
-            callback(null,res)
-        }
-    })
-}
-
-function logData(args, callback) {
-    seneca.act({
-        role: 'database',
-        cmd: 'logData'
-    }, {
-        device: args.DeviceID,
-        power: args.power,
-        energy: args.energy
-    }, function(err, res) {
-        if (err){ var c=2
-            //callback(err)
-          }
-        else {
-          //  callback(null,res)
-          var r=2
-        }
-    })
-}
-
-function getRandomFloat(min, max) {
-    return parseFloat(Math.random() * (max - min + 1) + min);
-}
-
-setInterval(function() {
-    if (subscribe == 'ON') {
-        logData({
-            DeviceID: 'TestDevice',
-            power: 123.8,
-            energy: 123.9
-        },function(err,res){
-          if(err){
-
-          }
-            //console.error(err)
-          else {
-            //console.log(res)
-          }
-        })
+      })
+      resolve(stopLog)
+    }catch(err){
+      reject(err)
     }
+  })
+}
 
-}, 5000)
+servicePlugin.prototype.showSubs = function() {
+  return new Promise(async function(resolve,reject){
+    try{
+      let show = await sendToService({
+          role: 'database',
+          cmd: 'showSubs'
+      },{})
+      resolve(show)
+    }catch(err){
+      reject(err)
+    }
+  })
+}
+
+servicePlugin.prototype.logData = function(args) {
+  return new Promise(async function(resolve,reject){
+    try{
+      let logData = await sendToService({
+          role: 'database',
+          cmd: 'logData'
+      }, {
+          device: args.DeviceID,
+          power: args.power,
+          energy: args.energy
+      })
+      resolve(logData)
+    }catch(err){
+      reject(err)
+    }
+  })
+}
+
+
+function sendToService(command, data) {
+  return new Promise(async function(resolve, reject) {
+    seneca.act(command, data, function(err, res) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res)
+      }
+    })
+  })
+}
+
+
 
 module.exports = servicePlugin;
