@@ -1,0 +1,2 @@
+nodejs services/Devicehive/tests/integrationTestDatabase.js
+nodejs services/Devicehive/tests/integrationTestSchedule.js

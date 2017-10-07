@@ -38,7 +38,7 @@ module.exports = function Database(options) {
    * @apiName logData
    * @apiGroup Database
    *
-   * @apiParam {String} device Unique device name.
+   * @apiParam {String} DeviceID Unique device name.
    * @apiParam {String} power Power data in whatts.
    * @apiParam {String} energy Energy data in whatts per hour.
    *
@@ -58,7 +58,7 @@ module.exports = function Database(options) {
    *     }
    */
   function logData(args, done) {
-    if (args.hasOwnProperty('device') == true &&
+    if (args.hasOwnProperty('DeviceID') == true &&
       args.hasOwnProperty('power') == true &&
       args.hasOwnProperty('energy') == true) {
       if(config.Debug == true){
@@ -91,7 +91,7 @@ module.exports = function Database(options) {
       })
     } else {
       done(null, {
-        result: 'Missing arguments! device , power or energy',
+        result: 'Missing arguments! DeviceID , power or energy',
         status: 'ERROR'
       })
     }
@@ -103,7 +103,7 @@ module.exports = function Database(options) {
    * @apiName getData
    * @apiGroup Database
    *
-   * @apiParam {String} device Unique device name.
+   * @apiParam {String} DeviceID Unique device name.
    * @apiParam {String} beginTime 2017-05-04 00:00:00 .
    * @apiParam {String} endTime 2017-05-04 00:10:00.
    *
@@ -122,7 +122,7 @@ module.exports = function Database(options) {
    *     }
    */
   function getData(args, done) {
-    if (args.hasOwnProperty('device') == true &&
+    if (args.hasOwnProperty('DeviceID') == true &&
       args.hasOwnProperty('beginTime') == true &&
       args.hasOwnProperty('endTime') == true) {
       if(config.Debug == true){
@@ -155,7 +155,7 @@ module.exports = function Database(options) {
       })
     } else {
       done(null, {
-        result: 'Missing arguments! device , beginTime or endTime',
+        result: 'Missing arguments! DeviceID , beginTime or endTime',
         status: 'ERROR'
       })
     }
@@ -217,7 +217,7 @@ module.exports = function Database(options) {
    * @apiParam {String} notification Notification name.
    */
   function startLog(args, done) {
-    if (args.hasOwnProperty('device') == true &&
+    if (args.hasOwnProperty('DeviceID') == true &&
       args.hasOwnProperty('notification') == true) {
       if(config.Debug == true){
         console.log('\nDatabase service , input , startLog function \n')
@@ -229,7 +229,7 @@ module.exports = function Database(options) {
         cmd: 'subscribe'
       }, {
         params: {
-          DeviceID: args.device,
+          DeviceID: args.DeviceID,
           notification: args.notification,
           service: 'database'
         }
@@ -251,7 +251,7 @@ module.exports = function Database(options) {
             console.log('\n')
           }
           done(null, {
-            result: `Started logging data for ${args.device}!`,
+            result: `Started logging data for ${args.DeviceID}!`,
             status: 'OK'
           })
         }
@@ -259,7 +259,7 @@ module.exports = function Database(options) {
       })
     } else {
       done(null, {
-        result: 'Missing argumets! device or notification.',
+        result: 'Missing argumets! DeviceID or notification.',
         status: "ERROR"
       })
     }
@@ -271,11 +271,11 @@ module.exports = function Database(options) {
    * @apiName stopLog
    * @apiGroup Database
    *
-   * @apiParam {String} device Unique device name.
+   * @apiParam {String} DeviceID Unique device name.
    * @apiParam {String} notification Notification name.
    */
   function stopLog(args, done) {
-    if (args.hasOwnProperty('device') == true &&
+    if (args.hasOwnProperty('DeviceID') == true &&
       args.hasOwnProperty('notification') == true) {
       if(config.Debug == true){
           console.log('\nDatabase service , input , stopLog function \n')
@@ -287,7 +287,7 @@ module.exports = function Database(options) {
         cmd: 'unsubscribe'
       }, {
         params: {
-          DeviceID: args.device,
+          DeviceID: args.DeviceID,
           notification: args.notification,
           service: 'database'
         }
@@ -309,14 +309,14 @@ module.exports = function Database(options) {
               console.log('\n')
           }
           done(null, {
-            result: `Stoped log for ${args.device}!`,
+            result: `Stoped log for ${args.DeviceID}!`,
             status: 'OK'
           })
         }
       })
     } else {
       done(null, {
-        result: 'Missing argumets! device or notification.',
+        result: 'Missing argumets! DeviceID or notification.',
         status: "ERROR"
       })
     }

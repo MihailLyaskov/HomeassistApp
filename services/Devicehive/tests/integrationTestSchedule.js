@@ -2,8 +2,8 @@
 var moment = require('moment-timezone');
 var config = require('config')
 const Hive = require('devicehive')
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJJZCI6MzUsImFjdGlvbnMiOlsiR2V0TmV0d29yayIsIkdldERldmljZSIsIkdldERldmljZVN0YXRlIiwiR2V0RGV2aWNlTm90aWZpY2F0aW9uIiwiR2V0RGV2aWNlQ29tbWFuZCIsIkdldERldmljZUNsYXNzIiwiUmVnaXN0ZXJEZXZpY2UiLCJDcmVhdGVEZXZpY2VOb3RpZmljYXRpb24iLCJDcmVhdGVEZXZpY2VDb21tYW5kIiwiVXBkYXRlRGV2aWNlQ29tbWFuZCIsIkdldEN1cnJlbnRVc2VyIiwiVXBkYXRlQ3VycmVudFVzZXIiLCJNYW5hZ2VUb2tlbiJdLCJuZXR3b3JrSWRzIjpbIjM1Il0sImRldmljZUlkcyI6WyIqIl0sImV4cGlyYXRpb24iOjE1MTQxMTcyNjE2NjQsInRva2VuVHlwZSI6IlJFRlJFU0gifX0.5OfU_uLhTBFKEvk9d9gCFoF4rk1EyeontYTfQ3ZDyQo'
-const dhNode = new Hive.rest('http://playground.devicehive.com/api/rest')
+const token = 'eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJJZCI6MzUsImFjdGlvbnMiOlsiR2V0TmV0d29yayIsIkdldERldmljZSIsIkdldERldmljZVN0YXRlIiwiR2V0RGV2aWNlTm90aWZpY2F0aW9uIiwiR2V0RGV2aWNlQ29tbWFuZCIsIkdldERldmljZUNsYXNzIiwiUmVnaXN0ZXJEZXZpY2UiLCJDcmVhdGVEZXZpY2VOb3RpZmljYXRpb24iLCJDcmVhdGVEZXZpY2VDb21tYW5kIiwiVXBkYXRlRGV2aWNlQ29tbWFuZCIsIkdldEN1cnJlbnRVc2VyIiwiVXBkYXRlQ3VycmVudFVzZXIiLCJNYW5hZ2VUb2tlbiJdLCJuZXR3b3JrSWRzIjpbIjM1Il0sImRldmljZUlkcyI6WyIqIl0sImV4cGlyYXRpb24iOjE1MjI1MzE0MTQ3MjUsInRva2VuVHlwZSI6IlJFRlJFU0gifX0.msHqtYSvj-MJ54DIdGcvMrIOAww1Z9nGhebvgDQXSww'
+const dhNode = new Hive.rest('https://playground.devicehive.com/api/rest')
 var mongoSchedule = null;
 var mongoSubs = null;
 //var mongodb = require("mongodb").MongoClient;
@@ -31,45 +31,45 @@ async function start() {
 
     console.log("Send schedule/create ")
     let newSchedule = await createSchedule()
-    console.log(newSchedule)
+    console.log(JSON.stringify(newSchedule,null,2))
     console.log('\n\n')
 
     let delay0 = await delay(5)
 
     console.log("Send Notification with power and energy measurements. Power 1000 Energy 1000")
     let notif1 = await sendNotification('TestDevice', "device/init", {
-      device: 'TestDevice',
+      DeviceID: 'TestDevice',
       power: 1000.0,
       energy: 1000.0
     })
-    console.log(notif1)
+    console.log(JSON.stringify(notif1,null,2))
     console.log('\n\n')
 
     let delay1 = await delay(5)
 
     console.log('Send schedule/showAll to see all schedules')
     let showAll = await sendCommand('homeassist', 'schedule/showAll', {})
-    console.log(showAll)
+    console.log(JSON.stringify(showAll,null,2))
     console.log('\n\n')
 
     let delay2 = await delay(5)
 
     console.log("Send Notification with power and energy measurements. Power 1000 Energy 1000 \n Expecting switch OFF command")
     let notif2 = await sendNotification('TestDevice', "device/init", {
-      device: 'TestDevice',
+      DeviceID: 'TestDevice',
       power: 1000.0,
       energy: 1000.0
     })
-    console.log(notif2)
+    console.log(JSON.stringify(notif2,null,2))
     console.log('\n\n')
 
-    let delay3 = await delay(30)
+    let delay3 = await delay(5)
 
     console.log("Send schedule/remove" )
     let removeSchedule = await sendCommand('homeassist', 'schedule/remove', {
       "DeviceID": "TestDevice"
     })
-    console.log(removeSchedule)
+    console.log(JSON.stringify(removeSchedule,null,2))
     console.log('\n\n')
 
 
@@ -77,7 +77,7 @@ async function start() {
     //let clearSubs = await mongoSubs.drop()
     //let clearSchedules = await mongoSchedule.drop()
 
-    process.exit(0)
+    process.exit()
 
   } catch (err) {
     console.log(err)
@@ -196,7 +196,7 @@ async function poll(_timestamp, deviceID) {
       console.log(commands[0])
       console.log('\n\n')
       id = commands[0]['id']
-      let update = await dhNode.updateCommand(deviceID, id.toString(), {status:'OK',result:'OK'})
+      let update = await dhNode.updateCommand(deviceID, id.toString(), {})
     }
     poll(timestamp, deviceID)
   } catch (err) {

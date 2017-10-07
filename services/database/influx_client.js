@@ -45,10 +45,10 @@ var influxdb_client = function() {
 influxdb_client.prototype.logData = function(args, callback) {
   console.log(`logging data power: ${args.power} , energy: ${args.energy}`)
   var time = fix_time()
-  writePoint.tags.device = args.device
+  writePoint.tags.device = args.DeviceID
   writePoint.time = time
-  writePoint.fields.power = args.power
-  writePoint.fields.energy = args.energy
+  writePoint.fields.power = parseFloat(args.power)
+  writePoint.fields.energy = parseFloat(args.energy)
   exec(`./services/database/influxDriver.py --write '${JSON.stringify(writePoint)}' --db '${database}'`, (error, stdout, stderr) => {
     var result = {}
     try {
@@ -71,10 +71,10 @@ influxdb_client.prototype.logData = function(args, callback) {
 influxdb_client.prototype.getData = function(args, callback) {
   let begin = fix_time2(args.beginTime)
   let end = fix_time2(args.endTime)
-  var query = `select "time" , "power" , "energy" from ${measurement} where device = '${args.device}' and time >= '${begin}' and time <= '${end}'`
+  var query = `select "time" , "power" , "energy" from ${measurement} where device = '${args.DeviceID}' and time >= '${begin}' and time <= '${end}'`
   exec(`./services/database/influxDriver.py --query "${query}" --db '${database}'`, (error, stdout, stderr) => {
     if (stdout == "{}") {
-      callback(null, `There is no data for ${args.device} in the period of ${args.beginTime} to ${args.endTime}.`)
+      callback(null, `There is no data for ${args.DeviceID} in the period of ${args.beginTime} to ${args.endTime}.`)
     } else {
       stdout = stdout.replace('\n','')
       var out = JSON.parse(stdout)

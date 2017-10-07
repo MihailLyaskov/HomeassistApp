@@ -69,7 +69,7 @@ servicePlugin.prototype.getData = function(args) {
           role: 'database',
           cmd: 'getData'
       }, {
-          device: args.DeviceID,
+          DeviceID: args.DeviceID,
           beginTime: args.beginTime,
           endTime: args.endTime
       })
@@ -87,7 +87,7 @@ servicePlugin.prototype.startLog = function(args) {
           role: 'database',
           cmd: 'startLog'
       },{
-          device: args.DeviceID,
+          DeviceID: args.DeviceID,
           notification: args.notification
       })
       resolve(start)
@@ -105,7 +105,7 @@ servicePlugin.prototype.stopLog = function(args) {
         role: 'database',
         cmd: 'stopLog'
       }, {
-        device: args.DeviceID,
+        DeviceID: args.DeviceID,
         notification: args.notification
       })
       resolve(stopLog)
@@ -136,7 +136,7 @@ servicePlugin.prototype.logData = function(args) {
           role: 'database',
           cmd: 'logData'
       }, {
-          device: args.DeviceID,
+          DeviceID: args.DeviceID,
           power: args.power,
           energy: args.energy
       })

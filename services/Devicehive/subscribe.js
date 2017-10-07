@@ -33,7 +33,11 @@ Subscribe.prototype.start = async function() {
         _timestamp = result['timestamp']
         console.log(result)
         if(result.length > 0)
-          pushToSeneca(result[0].parameters)
+          pushToSeneca({
+            DeviceID:result[0].parameters.DeviceID,
+            power:result[0].parameters.power,
+            energy:result[0].parameters.energy
+          })
       }
     } catch (err) {
       console.log(err)

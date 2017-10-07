@@ -13,7 +13,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "device",
+            "field": "DeviceID",
             "description": "<p>Unique device name.</p>"
           },
           {
@@ -78,7 +78,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "device",
+            "field": "DeviceID",
             "description": "<p>Unique device name.</p>"
           },
           {
@@ -212,7 +212,7 @@ define({ "api": [
             "group": "Parameter",
             "type": "String",
             "optional": false,
-            "field": "device",
+            "field": "DeviceID",
             "description": "<p>Unique device name.</p>"
           },
           {

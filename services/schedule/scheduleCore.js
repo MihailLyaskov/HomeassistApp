@@ -229,13 +229,15 @@ schedule.prototype.showSubs = function(args, done) {
 }
 
 schedule.prototype.evaluate = async function(args, done) {
-  console.log("SCHEDULE EVALUATE:")
+  //console.log("SCHEDULE EVALUATE:")
+  //console.log(args)
   try {
     let find = await _collection.findOne({
       Device: args.DeviceID
     })
     let energy = find.agrEnergy
     if (find.maxEnergy < (energy + args.energy)) {
+      console.log("MAX ENERGY OVERFLOW")
       let stopDevice = await _seneca.act({
         role: "client",
         cmd: "sendCommand",
@@ -415,14 +417,14 @@ function removeFromDatabase(DeviceID) {
 }
 
 function createJob(device, time, command,state) {
-  console.log(time)
+  //console.log(time)
   let timeArr = parceTimeData(time)
   let rule = new scheduler.RecurrenceRule();
   rule.hour = timeArr.hour;
   rule.minute = timeArr.minute;
   rule.second = timeArr.second;
   return scheduler.scheduleJob(rule, function() {
-    console.log(time);
+    //console.log(time);
     _seneca.act({
       role: "client",
       cmd: "sendCommand"

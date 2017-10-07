@@ -133,7 +133,7 @@ async function poll(_timestamp, deviceID) {
         result = await pushToService(checkCommands[commands[0]['command']], commands[0]['parameters'])
         console.log('Connector got response')
         console.log(result)
-        let update = await _devicehive.updateCommand(deviceID, id, result)
+        let update = await _devicehive.updateCommand(deviceID, id, {"result":result})
       }
     }
     poll(timestamp, deviceID)
