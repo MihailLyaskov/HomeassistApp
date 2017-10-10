@@ -15,11 +15,12 @@
           }
       }
 */
+const config = require('config')
 const m = require('moment-timezone');
 const exec = require('child_process').exec;
-var measurement = 'power_and_energy'
-var database = 'devicelog'
-var host = 'localhost'
+var measurement = config.device_config.influx_datastorage.measurement
+var database = config.device_config.influx_datastorage.database
+var host = config.device_config.influx_datastorage.host
 var writePoint = {
   "measurement": measurement,
   "tags": {

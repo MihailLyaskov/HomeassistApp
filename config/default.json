@@ -85,6 +85,11 @@
       "port": 27017,
       "database": "scheduler",
       "collection": "schedules"
+    },
+    "influx_datastorage": {
+      "measurement" : "power_and_energy",
+      "database" : "devicelog",
+      "host" : "localhost"
     }
   },
   "Debug": false

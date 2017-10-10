@@ -2,8 +2,8 @@
 var moment = require('moment-timezone');
 var config = require('config');
 const Hive = require('devicehive');
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJwYXlsb2FkIjp7InVzZXJJZCI6MzUsImFjdGlvbnMiOlsiR2V0TmV0d29yayIsIkdldERldmljZSIsIkdldERldmljZVN0YXRlIiwiR2V0RGV2aWNlTm90aWZpY2F0aW9uIiwiR2V0RGV2aWNlQ29tbWFuZCIsIkdldERldmljZUNsYXNzIiwiUmVnaXN0ZXJEZXZpY2UiLCJDcmVhdGVEZXZpY2VOb3RpZmljYXRpb24iLCJDcmVhdGVEZXZpY2VDb21tYW5kIiwiVXBkYXRlRGV2aWNlQ29tbWFuZCIsIkdldEN1cnJlbnRVc2VyIiwiVXBkYXRlQ3VycmVudFVzZXIiLCJNYW5hZ2VUb2tlbiJdLCJuZXR3b3JrSWRzIjpbIjM1Il0sImRldmljZUlkcyI6WyIqIl0sImV4cGlyYXRpb24iOjE1MjI1MzE0MTQ3MjUsInRva2VuVHlwZSI6IlJFRlJFU0gifX0.msHqtYSvj-MJ54DIdGcvMrIOAww1Z9nGhebvgDQXSww'
-const dhNode = new Hive.rest('https://playground.devicehive.com/api/rest')
+const token = config.DeviceHive.token
+const dhNode = new Hive.rest(config.DeviceHive.url)
 var begin = moment().tz("Europe/Sofia").format();
 var end = null;
 var mongoSchedule = null;
