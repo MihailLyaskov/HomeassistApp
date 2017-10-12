@@ -3,15 +3,13 @@ var config = null;;
 var mongoCollection = null;;
 var mongodb = require("mongodb").MongoClient;
 var devicehive = null;
-var seneca = null;
 
 var core = function(Config) {
   config = Config;
 }
 
-core.prototype.init = function(Devicehive, Seneca) {
+core.prototype.init = function(Devicehive) {
   devicehive = Devicehive;
-  seneca = Seneca;
   return new Promise(async function(resolve, reject) {
     try {
       let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
