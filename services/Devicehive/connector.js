@@ -1,5 +1,6 @@
 //@flow weak
-var Devicehive = require('devicehive');
+//var Devicehive = require('devicehive');
+const { init } = require(`../../node_modules/devicehive/src/api.js`);
 var Subscribe = require('./subscribe')
 
 var _config = null;
@@ -10,14 +11,14 @@ var _subscriptions = [];
 var Connector = function(config, seneca) {
   _config = config;
   _seneca = seneca;
-  _devicehive = new Devicehive.rest(_config.DeviceHive.url)
 }
 
 Connector.prototype.init = function() {
   return new Promise(async function(resolve, reject) {
     try {
+      _devicehive = await init(_config.DeviceHive.url)
       let newToken = await _devicehive.refreshToken(_config.DeviceHive.token)
-      _devicehive.token = newToken['accessToken'];
+      _devicehive.setTokens({accessToken:newToken['accessToken'],refreshToken:_config.DeviceHive.token})
       console.log('AccessToken received');
       refreshToken()
       let deviceConfig = _config.device_config.main_config;

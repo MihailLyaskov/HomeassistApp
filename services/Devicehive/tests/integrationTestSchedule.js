@@ -1,9 +1,9 @@
 //@flow weak
 var moment = require('moment-timezone');
 var config = require('config')
-const Hive = require('devicehive')
+const { init } = require(`../../../node_modules/devicehive/src/api.js`);
 const token = config.DeviceHive.token
-const dhNode = new Hive.rest(config.DeviceHive.url)
+var dhNode = null;
 var mongoSchedule = null;
 var mongoSubs = null;
 //var mongodb = require("mongodb").MongoClient;
@@ -11,6 +11,7 @@ var mongoSubs = null;
 
 async function start() {
   try {
+    dhNode = await init(config.DeviceHive.url)
     //let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
     //mongoSubs = await mongo.collection(config.device_config.mongo.collection);
 
@@ -18,13 +19,14 @@ async function start() {
     //mongoSchedule = await mongo2.collection(config.device_config.mongoSchedule.collection);
 
     let newToken = await dhNode.refreshToken(token)
-    dhNode.token = newToken['accessToken'];
+    dhNode.setTokens({accessToken:newToken['accessToken'],refreshToken:token})
     console.log('Token refreshed');
     let save = await dhNode.saveDevice('TestDevice', {
       name: 'TestDevice'
     })
     let getInfo = await dhNode.getInfo()
     let timestamp = getInfo['serverTimestamp']
+    console.log(timestamp)
     poll(timestamp, 'TestDevice')
 
     //TESTS
@@ -190,11 +192,13 @@ async function poll(_timestamp, deviceID) {
       timestamp: _timestamp,
       deviceIds: deviceID
     })
-    timestamp = commands['timestamp']
+    //console.log(JSON.stringify(commands))
+    //timestamp = commands[0]['timestamp']
     if (commands.length > 0) {
       console.log('TestDevice recieved command:')
       console.log(commands[0])
       console.log('\n\n')
+      timestamp = commands[0]['timestamp']
       id = commands[0]['id']
       let update = await dhNode.updateCommand(deviceID, id.toString(), {})
     }

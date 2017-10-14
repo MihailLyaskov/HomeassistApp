@@ -1,6 +1,5 @@
 //@flow weak
 const config = require('config');
-
 var Connector = require("./connector")
 var ServiceCore = require("./serviceCore");
 var seneca = require('seneca')({

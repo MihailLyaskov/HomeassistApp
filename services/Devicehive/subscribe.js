@@ -30,9 +30,10 @@ Subscribe.prototype.start = async function() {
         timestamp: _timestamp
       })
       if (polling == true) {
-        _timestamp = result['timestamp']
+        //_timestamp = result['timestamp']
         console.log(result)
         if(result.length > 0)
+          _timestamp = result[0]['timestamp']
           pushToSeneca({
             DeviceID:result[0].parameters.DeviceID,
             power:result[0].parameters.power,
