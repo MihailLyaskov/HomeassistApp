@@ -15,9 +15,9 @@ var wrapper = function() {
 
 wrapper.prototype.init = async function(callback) {
   try {
-    let devicehive = await connector.init();
     let senecaClients = await createClients();
     let senecaListen = await seneca.listen()
+    let devicehive = await connector.init();
     let Core = await core.init(connector);
     let initPlugin = await seneca.use('./busPlugin', {
       core: core
