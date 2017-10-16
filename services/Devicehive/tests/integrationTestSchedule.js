@@ -38,6 +38,13 @@ async function start() {
 
     let delay0 = await delay(5)
 
+    console.log('Send schedule/showSubs to see all subscriptions')
+    let ShowSubs = await sendCommand('homeassist', 'schedule/showSubs', {})
+    console.log(JSON.stringify(ShowSubs,null,2))
+    console.log('\n\n')
+
+    let del = await delay(5)
+
     console.log("Send Notification with power and energy measurements. Power 1000 Energy 1000")
     let notif1 = await sendNotification('TestDevice', "device/init", {
       DeviceID: 'TestDevice',

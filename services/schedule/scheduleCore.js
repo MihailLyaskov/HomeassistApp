@@ -212,6 +212,10 @@ schedule.prototype.showSubs = function(args, done) {
   _seneca.act({
     role: 'client',
     cmd: 'showSubs'
+  }, {
+    params: {
+      service: 'schedule'
+    }
   }, function(err, res) {
     if (res.status == 'Error') {
       //console.error(err)

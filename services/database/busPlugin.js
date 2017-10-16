@@ -338,6 +338,10 @@ module.exports = function Database(options) {
     seneca.act({
       role: 'client',
       cmd: 'showSubs'
+    }, {
+      params: {
+        service: 'database'
+      }
     }, function(err, res) {
       if (res.status == 'Error') {
         if(config.Debug == true){

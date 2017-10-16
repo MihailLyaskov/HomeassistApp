@@ -26,7 +26,7 @@ core.prototype.init = function(Devicehive) {
 core.prototype.showSubs = async function(args, done) {
   try {
     console.log("hi from show subs")
-    let result = await mongoCollection.find()
+    let result = await mongoCollection.find({subService: args.params.service})
     let toArray = await result.toArray()
     done(null, {
       data: toArray,

@@ -10,18 +10,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.3.0",
-    "config": "^1.25.1",
+    "async": "^2.5.0",
+    "config": "^1.26.2",
     "devicehive": "^1.1.4",
     "influx": "^5.0.7",
-    "moment": "^2.18.1",
-    "mongodb": "^2.2.26",
-    "node-schedule": "^1.2.3",
-    "seneca": "^3.3.0"
+    "moment": "^2.19.1",
+    "mongodb": "^2.2.33",
+    "node-schedule": "^1.2.5",
+    "seneca": "^3.4.3"
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
-    "chai": "^4.0.2",
-    "mocha": "^3.4.2"
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3"
   }
 }
