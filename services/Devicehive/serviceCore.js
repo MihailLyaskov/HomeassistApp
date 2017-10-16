@@ -122,6 +122,7 @@ core.prototype.unsubscribe = async function(args, done) {
     try {
       let sub = await mongoCollection.findOne({
         Device: args.params.DeviceID,
+        notification: args.params.notification,
         subService: args.params.service
       })
       let unsubRes = await unsub(sub)
