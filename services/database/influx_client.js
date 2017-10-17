@@ -34,13 +34,18 @@ var writePoint = {
 }
 
 var influxdb_client = function() {
-  exec(`./services/database/influxDriver.py --createDB '${database}' --db '${database}'`, (error, stdout, stderr) => {
+
+}
+
+influxdb_client.prototype.createDB = function(callback) {
+  exec(`./services/database/influxDriver.py --createDB '${database}'`, (error, stdout, stderr) => {
     if (error) {
       //console.error(`exec error: ${error}`);
-      console.error(error)
-      return;
-    }
-  });
+      //console.error(error)
+      callback(err)
+    } else
+      callback(null)
+  })
 }
 
 influxdb_client.prototype.logData = function(args, callback) {
@@ -77,41 +82,41 @@ influxdb_client.prototype.getData = function(args, callback) {
     if (stdout == "{}") {
       callback(null, `There is no data for ${args.DeviceID} in the period of ${args.beginTime} to ${args.endTime}.`)
     } else {
-      stdout = stdout.replace('\n','')
+      stdout = stdout.replace('\n', '')
       var out = JSON.parse(stdout)
-      if(out.series)
+      if (out.series)
         callback(null, out.series[0])
       else {
         console.log(out)
-        callback(null,"Try again")
+        callback(null, "Try again")
       }
     }
   });
 }
 
 influxdb_client.prototype.showDevices = function(callback) {
-  exec(`./services/database/influxDriver.py --query 'show tag values from ${measurement} with key = device' --db '${database}'`,(error, stdout, stderr) => {
+  exec(`./services/database/influxDriver.py --query 'show tag values from ${measurement} with key = device' --db '${database}'`, (error, stdout, stderr) => {
     if (stdout == "{}") {
       callback(null, `There are no logged devices.`)
     } else {
-      stdout = stdout.replace('\n','')
+      stdout = stdout.replace('\n', '')
       var out = JSON.parse(stdout)
       callback(null, out.series[0])
     }
   })
 }
 
-function fix_time(){
+function fix_time() {
   var time = m().tz("Europe/Sofia").format()
-  var time1 = time.substring(0,10)
-  var time2 = time.substring(11,19)
+  var time1 = time.substring(0, 10)
+  var time2 = time.substring(11, 19)
   var time3 = time1 + ' ' + time2
   return time3
 }
 
-function fix_time2(time){
-  var time1 = time.substring(0,10)
-  var time2 = time.substring(11,19)
+function fix_time2(time) {
+  var time1 = time.substring(0, 10)
+  var time2 = time.substring(11, 19)
   var time3 = time1 + ' ' + time2
   return time3
 }

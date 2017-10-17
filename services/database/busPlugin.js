@@ -2,9 +2,18 @@
 
 const influx_client = require('./influx_client')
 const config = require('config')
+var database = null
+
 
 module.exports = function Database(options) {
-  var database = new influx_client();
+  database = new influx_client();
+  database.createDB(function(err){
+    if(err)
+      console.log(err)
+    else {
+      console.log("Database created!")
+    }
+  });
   var seneca = this;
 
   seneca.add({
