@@ -57,7 +57,7 @@ schedule.prototype.init = async function(callback) {
  */
 schedule.prototype.create = async function(args, done) {
   if (validateSchedule(args)) {
-    if(config.Debug == true){
+    if (config.Debug == true) {
       console.log('\n Schedule service , input , create function \n')
       console.log(args)
       console.log('\n')
@@ -77,37 +77,32 @@ schedule.prototype.create = async function(args, done) {
           result: name + ' already has a schedule! Remove it first!',
           status: "ERROR"
         })
-      }
-    } catch (err) {
-      //console.log(err)
-    }
-    if (check == null) {
-      for (let i = 0; i < len; i++) {
-        let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, args.start, "On")
-        jobs.push(beginJob)
-        let endJob = createJob(args.DeviceID, args.schedule[i].endTime, args.stop, "Off")
-        jobs.push(endJob)
-      }
-      // This job resets agregated energy for this schedule in 00:00:00 every day
-      let resetJob = resetAgrEnergyJob(args.DeviceID)
-      jobs.push(resetJob)
-      //Add schedule jobs objects to _jobs array for use later
-      _jobs.push({
-        device: args.DeviceID,
-        jobs: jobs
-      });
-      //Save the new schedule to database
-      try {
+      } else {
+        for (let i = 0; i < len; i++) {
+          let beginJob = createJob(args.DeviceID, args.schedule[i].beginTime, args.start, "On")
+          jobs.push(beginJob)
+          let endJob = createJob(args.DeviceID, args.schedule[i].endTime, args.stop, "Off")
+          jobs.push(endJob)
+        }
+        // This job resets agregated energy for this schedule in 00:00:00 every day
+        let resetJob = resetAgrEnergyJob(args.DeviceID)
+        jobs.push(resetJob)
+        //Add schedule jobs objects to _jobs array for use later
+        _jobs.push({
+          device: args.DeviceID,
+          jobs: jobs
+        });
+        //Save the new schedule to database
         let saveToMongo = await storeInDatabase(args)
         let subscibe = await makeSubscription(args.DeviceID, args.notification)
         //console.log(saveToMongo)
-      } catch (err) {
-        console.error(err)
+        done(null, {
+          result: "Created daily schedule for " + args.DeviceID,
+          status: "OK"
+        })
       }
-      done(null, {
-        result: "Created daily schedule for " + args.DeviceID,
-        status: "OK"
-      })
+    } catch (err) {
+      console.log(err)
     }
   } else {
     done(null, {
@@ -156,9 +151,9 @@ schedule.prototype.remove = async function(args, done) {
               result: "Schedule for " + args.DeviceID + " is removed!",
               status: "OK"
             })
+            break;
           }
         }
-
       } else {
         done(null, {
           result: result.message,
@@ -301,7 +296,7 @@ function reCreateSchedules() {
           for (let j = 0; j < scheduleCount; j++) {
             let beginJob = createJob(result[i].Device, result[i].schedule[j].beginTime, result[i].start, "On")
             jobs.push(beginJob)
-            let endJob = createJob(result[i].Device, result[i].schedule[j].endTime, result[i].stop,"Off")
+            let endJob = createJob(result[i].Device, result[i].schedule[j].endTime, result[i].stop, "Off")
             jobs.push(endJob)
           }
           // This job resets agregated energy for this schedule in 00:00:00 every day
@@ -420,7 +415,7 @@ function removeFromDatabase(DeviceID) {
   })
 }
 
-function createJob(device, time, command,state) {
+function createJob(device, time, command, state) {
   //console.log(time)
   let timeArr = parceTimeData(time)
   let rule = new scheduler.RecurrenceRule();
