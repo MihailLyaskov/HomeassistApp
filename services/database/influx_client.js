@@ -21,15 +21,17 @@ const exec = require('child_process').exec;
 var measurement = config.device_config.influx_datastorage.measurement
 var database = config.device_config.influx_datastorage.database
 var host = config.device_config.influx_datastorage.host
-var writePoint = {
-  "measurement": measurement,
-  "tags": {
-    "device": null
-  },
-  "time": null,
-  "fields": {
-    "power": null,
-    "energy": null
+var writePoint = function(){
+  return {
+    "measurement": measurement,
+    "tags": {
+      "device": null
+    },
+    "time": null,
+    "fields": {
+      "power": null,
+      "energy": null
+    }
   }
 }
 
@@ -50,12 +52,13 @@ influxdb_client.prototype.createDB = function(callback) {
 
 influxdb_client.prototype.logData = function(args, callback) {
   console.log(`logging data power: ${args.power} , energy: ${args.energy}`)
+  let currnet_writePoint = writePoint()
   var time = fix_time()
-  writePoint.tags.device = args.DeviceID
-  writePoint.time = time
-  writePoint.fields.power = parseFloat(args.power)
-  writePoint.fields.energy = parseFloat(args.energy)
-  exec(`./services/database/influxDriver.py --write '${JSON.stringify(writePoint)}' --db '${database}'`, (error, stdout, stderr) => {
+  currnet_writePoint.tags.device = args.DeviceID
+  currnet_writePoint.time = time
+  currnet_writePoint.fields.power = parseFloat(args.power)
+  currnet_writePoint.fields.energy = parseFloat(args.energy)
+  exec(`./services/database/influxDriver.py --write '${JSON.stringify(currnet_writePoint)}' --db '${database}'`, (error, stdout, stderr) => {
     var result = {}
     try {
       result = JSON.parse(stdout)
