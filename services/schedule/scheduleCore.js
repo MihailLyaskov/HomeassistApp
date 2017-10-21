@@ -2,7 +2,7 @@
 const config = require('config');
 const mongodb = require("mongodb").MongoClient;
 const scheduler = require('node-schedule');
-var _jobs = []
+var schedules = []
 var _seneca = null
 var _collection = null;
 
@@ -87,8 +87,8 @@ schedule.prototype.create = async function(args, done) {
         // This job resets agregated energy for this schedule in 00:00:00 every day
         let resetJob = resetAgrEnergyJob(args.DeviceID)
         jobs.push(resetJob)
-        //Add schedule jobs objects to _jobs array for use later
-        _jobs.push({
+        //Add schedule jobs objects to schedules array for use later
+        schedules.push({
           device: args.DeviceID,
           jobs: jobs
         });
@@ -138,14 +138,14 @@ schedule.prototype.remove = async function(args, done) {
         removeSub = await removeSubscription(args.DeviceID, result.notification)
         //Cancel jobs working on the removed schedule
         // find schedule
-        for (let i = 0; i < _jobs.length; i++) {
-          if (_jobs[i].device == args.DeviceID) {
-            let len = _jobs[i].jobs.length;
+        for (let i = 0; i < schedules.length; i++) {
+          if (schedules[i].device == args.DeviceID) {
+            let len = schedules[i].jobs.length;
             for (let j = 0; j < len; j++) {
-              let cancel = await _jobs[i].jobs[j].cancel();
+              let cancel = await schedules[i].jobs[j].cancel();
             }
-            //Remove jobs from _jobs array
-            _jobs.splice(result.index, 1);
+            //Remove jobs from schedules array
+            schedules.splice(result.index, 1);
             //Send result message
             done(null, {
               result: "Schedule for " + args.DeviceID + " is removed!",
@@ -303,12 +303,12 @@ function reCreateSchedules() {
           let resetJob = resetAgrEnergyJob(result[i].DeviceID)
           jobs.push(resetJob)
 
-          _jobs.push({
+          schedules.push({
             jobs: jobs
           })
         }
         resolve()
-        console.log(_jobs)
+        console.log(schedules)
       }
     } catch (err) {
       reject(err)
