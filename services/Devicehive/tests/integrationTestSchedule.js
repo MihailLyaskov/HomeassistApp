@@ -20,27 +20,30 @@ async function start() {
 
     let newToken = await dhNode.refreshToken(token)
     dhNode.setTokens({accessToken:newToken['accessToken'],refreshToken:token})
-    console.log('Token refreshed');
     let save = await dhNode.saveDevice('TestDevice', {
       name: 'TestDevice'
     })
     let getInfo = await dhNode.getInfo()
     let timestamp = getInfo['serverTimestamp']
-    console.log(timestamp)
     poll(timestamp, 'TestDevice')
 
     //TESTS
+    console.log('***************************************** ')
+    console.log('* Integration test for Schedule Service * ')
+    console.log('***************************************** \n')
 
-    console.log("Send schedule/create ")
+    console.log("Send schedule/create command to create schedule with paramters:")
     let newSchedule = await createSchedule()
-    console.log(JSON.stringify(newSchedule,null,2))
+    console.log('\nRecieved: ')
+    console.log(JSON.stringify(newSchedule.result,null,2))
     console.log('\n\n')
 
     let delay0 = await delay(5)
 
-    console.log('Send schedule/showSubs to see all subscriptions')
+    console.log('Send schedule/showSubs command to see all subscriptions')
     let ShowSubs = await sendCommand('homeassist', 'schedule/showSubs', {})
-    console.log(JSON.stringify(ShowSubs,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(ShowSubs.result,null,2))
     console.log('\n\n')
 
     let del = await delay(5)
@@ -51,6 +54,7 @@ async function start() {
       power: 1000.0,
       energy: 1000.0
     })
+    console.log('Recieved: ')
     console.log(JSON.stringify(notif1,null,2))
     console.log('\n\n')
 
@@ -58,7 +62,8 @@ async function start() {
 
     console.log('Send schedule/showAll to see all schedules')
     let showAll = await sendCommand('homeassist', 'schedule/showAll', {})
-    console.log(JSON.stringify(showAll,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(showAll.result,null,2))
     console.log('\n\n')
 
     let delay2 = await delay(5)
@@ -74,17 +79,14 @@ async function start() {
 
     let delay3 = await delay(5)
 
-    console.log("Send schedule/remove" )
+    console.log("Send schedule/remove command." )
     let removeSchedule = await sendCommand('homeassist', 'schedule/remove', {
       "DeviceID": "TestDevice"
     })
-    console.log(JSON.stringify(removeSchedule,null,2))
+    console.log('Parameters sent:\n'+JSON.stringify(removeSchedule.parameters,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(removeSchedule.result,null,2))
     console.log('\n\n')
-
-
-    // Clear mongo database from created schedules and subscriptions
-    //let clearSubs = await mongoSubs.drop()
-    //let clearSchedules = await mongoSchedule.drop()
 
     process.exit()
 

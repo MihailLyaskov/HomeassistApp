@@ -8,83 +8,89 @@ var begin = moment().tz("Europe/Sofia").format();
 var end = null;
 var mongoSchedule = null;
 var mongoSubs = null;
-//var mongodb = require("mongodb").MongoClient;
+
 
 
 async function start() {
   try {
     dhNode = await init(config.DeviceHive.url)
-    //let mongo = await mongodb.connect('mongodb://' + config.device_config.mongo.host + ':' + config.device_config.mongo.port + '/' + config.device_config.mongo.database);
-    //mongoSubs = await mongo.collection(config.device_config.mongo.collection);
-
-    //let mongo2 = await mongodb.connect('mongodb://' + config.device_config.mongoSchedule.host + ':' + config.device_config.mongoSchedule.port + '/' + config.device_config.mongoSchedule.database);
-    //mongoSchedule = await mongo2.collection(config.device_config.mongoSchedule.collection);
 
     let newToken = await dhNode.refreshToken(token)
     dhNode.setTokens({accessToken:newToken['accessToken'],refreshToken:token})
-    console.log('Token refreshed');
     let save = await dhNode.saveDevice('TestDevice', {
       name: 'TestDevice'
     })
 
     //TESTS
-    console.log('Send database/startLog')
+    console.log('***************************************** ')
+    console.log('* Integration test for Database Service * ')
+    console.log('***************************************** \n')
+
+    console.log('Send database/startLog command to subscribe for energy notifications.')
     let startLog = await sendCommand('homeassist', 'database/startLog', {
       DeviceID: 'TestDevice',
       notification: 'energy'
     })
-    console.log(startLog)
+    console.log('Parameters sent:\n' + JSON.stringify(startLog.parameters,null,2))
+    console.log('Recieved: ')
+    console.log(startLog.result)
     console.log('\n\n')
 
-    console.log('Send database/showSubs to see if subscription is made')
+    console.log('Send database/showSubs to see if subscription for notifications is made')
     let showSubs = await sendCommand('homeassist', 'database/showSubs', {})
-    console.log(JSON.stringify(showSubs,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(showSubs.result,null,2))
     console.log('\n\n')
 
     let delay1 = await delay(3)
 
-    console.log('Send notification from TestDevice')
+    console.log('Send notification from TestDevice with parameters:\n{\n\tDeviceID: \'TestDevice\n\t\',power: 100.1\n\t,energy: 100.1\n}')
     let notif1 = await sendNotification('TestDevice', 'energy', {
       DeviceID: 'TestDevice',
       power: 100.1,
       energy: 100.1
     })
+    console.log('Recieved: ')
     console.log(notif1)
     console.log('\n\n')
 
     let delay2 = await delay(3)
 
-    console.log('Send notification from TestDevice')
+    console.log('Send notification from TestDevice with parameters:\n{\n\tDeviceID: \'TestDevice\n\t\',power: 100.1\n\t,energy: 100.1\n}')
     let notif2 = await sendNotification('TestDevice', 'energy', {
       DeviceID: 'TestDevice',
       power: 100.1,
       energy: 100.1
     })
+    console.log('Recieved: ')
     console.log(notif2)
     console.log('\n\n')
 
     let delay3 = await delay(3)
 
-    console.log('Send notification from TestDevice')
+    console.log('Send notification from TestDevice with parameters:\n{\n\tDeviceID: \'TestDevice\n\t\',power: 100.1\n\t,energy: 100.1\n}')
     let notif3 = await sendNotification('TestDevice', 'energy', {
       DeviceID: 'TestDevice',
       power: 100.1,
       energy: 100.1
     })
+    console.log('Recieved: ')
     console.log(notif3)
     console.log('\n\n')
 
-    console.log('Send database/stopLog')
+    console.log('Send database/stopLog command to unsubscribe from energy notifications.')
     let stopLog = await sendCommand('homeassist', 'database/stopLog', {
       DeviceID: 'TestDevice',
       notification: 'energy'
     })
-    console.log(stopLog)
+    console.log('Recieved: ')
+    console.log(stopLog.result)
     console.log('\n\n')
 
-    console.log('Send database/showSubs to see if subscription is removed ')
+    console.log('Send database/showSubs command to see if subscription is removed ')
     let showSubs2 = await sendCommand('homeassist', 'database/showSubs', {})
-    console.log(JSON.stringify(showSubs2,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(showSubs2.result,null,2))
     console.log('\n\n')
 
     end = moment().tz("Europe/Sofia").format();
@@ -95,16 +101,17 @@ async function start() {
       beginTime: begin,
       endTime: end
     })
-    console.log(JSON.stringify(getData,null,2))
+    console.log('Parameters sent:\n' + JSON.stringify(getData.parameters,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(getData.result,null,2))
     console.log('\n\n')
 
     console.log('Send database/showDevices to see all logged devices')
     let getDevices = await sendCommand('homeassist', 'database/showDevices', {})
-    console.log(JSON.stringify(getDevices,null,2))
+    console.log('Recieved: ')
+    console.log(JSON.stringify(getDevices.result,null,2))
     console.log('\n\n')
 
-    //let clearSubs = await mongoSubs.drop()
-    //let clearSchedules = await mongoSchedule.drop()
 
     process.exit()
 
